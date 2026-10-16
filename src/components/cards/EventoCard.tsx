@@ -1,3 +1,4 @@
+import { ReactNode } from 'react';
 import {
   View,
   Text,
@@ -6,6 +7,8 @@ import {
   StyleSheet,
   Platform,
   useColorScheme,
+  StyleProp,
+  ViewStyle,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Evento } from '@/types/evento';
@@ -20,9 +23,16 @@ const IMAGEM_PADRAO = require('../../assets/museu.jpeg');
 interface EventoCardProps {
   evento: Evento;
   aoPressionar?: () => void;
+  estilo?: StyleProp<ViewStyle>;
+  children?: ReactNode;
 }
 
-export function EventoCard({ evento, aoPressionar }: EventoCardProps) {
+export function EventoCard({
+  evento,
+  aoPressionar,
+  estilo,
+  children,
+}: EventoCardProps) {
   const scheme = useColorScheme();
   const cores = Colors[scheme === 'dark' ? 'dark' : 'light'];
 
@@ -43,6 +53,7 @@ export function EventoCard({ evento, aoPressionar }: EventoCardProps) {
           backgroundColor: cores.background,
           borderColor: cores.backgroundSelected,
         },
+        estilo,
       ]}
       onPress={aoPressionar}
       activeOpacity={0.85}
@@ -85,6 +96,7 @@ export function EventoCard({ evento, aoPressionar }: EventoCardProps) {
             {evento.endereco}
           </Text>
         </View>
+        {children}
       </View>
     </TouchableOpacity>
   );
