@@ -39,5 +39,10 @@ export async function request<T>(
     throw new Error(mensagemErro);
   }
 
+  // Exclusões da API retornam 204 sem corpo para decodificar.
+  if (response.status === 204) {
+    return undefined as T;
+  }
+
   return (await response.json()) as T;
 }
