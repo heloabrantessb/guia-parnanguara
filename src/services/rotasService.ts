@@ -1,5 +1,5 @@
 import { request } from './api';
-import { Rota } from '@/types/rota';
+import { Rota, SolicitacaoGeracaoRota } from '@/types/rota';
 
 function formatarCaminhoRotas(sufixo: string): string {
   const urlBase = (process.env.EXPO_PUBLIC_API_URL || '').replace(/\/+$/, '');
@@ -43,6 +43,17 @@ export async function criarRotaManual(
     method: 'POST',
     headers: criarCabecalhosAutenticacao(tokenAcesso),
     body: JSON.stringify({ titulo, atrativo_ids: atrativoIds }),
+  });
+}
+
+export async function gerarRota(
+  solicitacao: SolicitacaoGeracaoRota,
+  tokenAcesso: string
+): Promise<Rota> {
+  return request<Rota>(formatarCaminhoRotas('/gerar'), {
+    method: 'POST',
+    headers: criarCabecalhosAutenticacao(tokenAcesso),
+    body: JSON.stringify(solicitacao),
   });
 }
 

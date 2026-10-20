@@ -122,3 +122,31 @@ teste('request continua lendo JSON e rejeitando falhas de exclusão', async () =
   verificar.equal(await api.request('/v1/rotas/7'), rota);
   await verificar.rejects(api.request('/v1/rotas/7', { method: 'DELETE' }), /Acesso negado/);
 });
+
+teste('gera roteiro com tempo e preferências usando autenticação nas quatro bases', async () => {
+  for (const urlBase of ['http://api.exemplo', 'http://api.exemplo/', 'http://api.exemplo/v1', 'http://api.exemplo/v1/']) {
+    const chamadas = [];
+    const rota = { id: 10, titulo: 'Cultura', duracao_estimada_minutos: 90, itens: [] };
+    const servico = carregarServico(urlBase, async (caminho, opcoes) => {
+      chamadas.push({ caminho, opcoes });
+      return rota;
+    });
+    const solicitacao = { titulo: 'Cultura', tempo_disponivel_minutos: 120, categoria_ids: [3, 7] };
+    verificar.equal(await servico.gerarRota(solicitacao, 'token-ficticio'), rota);
+    verificar.equal(chamadas[0].caminho, urlBase.replace(/\/$/, '').endsWith('/v1') ? '/rotas/gerar' : '/v1/rotas/gerar');
+    verificar.equal(chamadas[0].opcoes.method, 'POST');
+    verificar.equal(chamadas[0].opcoes.headers.Authorization, 'Bearer token-ficticio');
+    verificar.deepEqual(JSON.parse(chamadas[0].opcoes.body), solicitacao);
+  }
+});
+
+teste('geração exige token antes de enviar solicitação', async () => {
+  const servico = carregarServico('http://api.exemplo', async () => verificar.fail('Chamada sem token'));
+  await verificar.rejects(servico.gerarRota({ titulo: 'Cultura', tempo_disponivel_minutos: 60, categoria_ids: [1] }, ' '), /Entre na sua conta/);
+});
+
+teste('geração preserva rejeição do backend quando não há opções compatíveis', async () => {
+  const erroApi = new Error('Nenhum atrativo combina com suas preferências e o tempo disponível neste horário.');
+  const servico = carregarServico('http://api.exemplo', async () => { throw erroApi; });
+  await verificar.rejects(servico.gerarRota({ titulo: 'Cultura', tempo_disponivel_minutos: 10, categoria_ids: [1] }, 'token-ficticio'), (erro) => erro === erroApi);
+});

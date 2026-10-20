@@ -8,6 +8,7 @@ export interface Evento {
   latitude: string | number;
   longitude: string | number;
   ativo: boolean;
+  duracao_visita_minutos: number;
   valor_entrada: string | number | null;
   categorias: CategoriaLocal[];
   imagens: ImagemLocal[];
