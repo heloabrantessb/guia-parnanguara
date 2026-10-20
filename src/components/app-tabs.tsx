@@ -38,6 +38,14 @@ export default function AppTabs() {
           /> 
       </NativeTabs.Trigger>
 
+      <NativeTabs.Trigger name='eventos'>
+        <NativeTabs.Trigger.Label>Eventos</NativeTabs.Trigger.Label>
+          <NativeTabs.Trigger.Icon
+            src={<VectorIcon family={MaterialIcons} name='event'/>}
+            renderingMode="template"
+          />
+      </NativeTabs.Trigger>
+
       <NativeTabs.Trigger name='perfil'>
         <NativeTabs.Trigger.Label>Perfil</NativeTabs.Trigger.Label>
           <NativeTabs.Trigger.Icon
