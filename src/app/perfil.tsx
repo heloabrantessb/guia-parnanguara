@@ -3,6 +3,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useAutenticacao } from '@/contexts/AutenticacaoContext';
 import { PreferenciaTema, useTema } from '@/contexts/TemaContext';
+import { MascoteCaranguejo } from '@/components/identidade/MascoteCaranguejo';
 import { SimboloLitoraneo } from '@/components/identidade/SimboloLitoraneo';
 import { CoresTema } from '@/utils/theme';
 
@@ -70,17 +71,30 @@ export default function Perfil() {
           {erroTema && <Text style={estilos.erro} accessibilityRole="alert">{erroTema}</Text>}
         </View>
 
-        <TouchableOpacity
-          style={estilos.botaoConta}
-          onPress={sairDaConta}
-          accessibilityRole="button"
-        >
-          <Ionicons name={ehVisitante ? 'log-in-outline' : 'log-out-outline'} size={20} color={ehVisitante ? cores.principal : cores.perigo} />
-          <Text style={[estilos.textoBotaoConta, { color: ehVisitante ? cores.principal : cores.perigo }]}>
-            {ehVisitante ? 'Fazer login ou cadastrar' : 'Sair da conta'}
-          </Text>
-          <Ionicons name="chevron-forward" size={18} color={cores.textSecondary} />
-        </TouchableOpacity>
+        <View style={estilos.cartaoConta}>
+          <View style={estilos.despedidaMascote}>
+            <MascoteCaranguejo pose="horizonte" tamanho={176} />
+            <Text style={estilos.tituloDespedida}>
+              {ehVisitante ? 'Mais caminhos para descobrir' : 'Até o próximo passeio!'}
+            </Text>
+            <Text style={estilos.descricaoDespedida}>
+              {ehVisitante
+                ? 'Entre na sua conta e planeje sua próxima visita ao litoral.'
+                : 'O litoral guarda novas histórias para a sua próxima visita.'}
+            </Text>
+          </View>
+          <TouchableOpacity
+            style={estilos.botaoConta}
+            onPress={sairDaConta}
+            accessibilityRole="button"
+          >
+            <Ionicons name={ehVisitante ? 'log-in-outline' : 'log-out-outline'} size={20} color={ehVisitante ? cores.principal : cores.perigo} />
+            <Text style={[estilos.textoBotaoConta, { color: ehVisitante ? cores.principal : cores.perigo }]}>
+              {ehVisitante ? 'Fazer login ou cadastrar' : 'Sair da conta'}
+            </Text>
+            <Ionicons name="chevron-forward" size={18} color={cores.textSecondary} />
+          </TouchableOpacity>
+        </View>
         <View style={estilos.marca}>
           <SimboloLitoraneo tamanho={44} />
           <Text style={estilos.nomeMarca}>Guia Parnanguara</Text>
@@ -110,7 +124,11 @@ const criarEstilos = (cores: CoresTema) => StyleSheet.create({
   textoOpcao: { color: cores.textSecondary, fontSize: 12, fontWeight: '600' },
   legenda: { color: cores.textSecondary, fontSize: 12, lineHeight: 18 },
   erro: { color: cores.perigo, fontSize: 13, lineHeight: 20, marginTop: 10 },
-  botaoConta: { padding: 20, backgroundColor: cores.backgroundElement, borderRadius: 20, flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 16, borderWidth: 1, borderColor: cores.backgroundSelected },
+  cartaoConta: { marginTop: 20, padding: 20, borderRadius: 24, backgroundColor: cores.backgroundElement, borderWidth: 1, borderColor: cores.backgroundSelected },
+  despedidaMascote: { alignItems: 'center', gap: 8 },
+  tituloDespedida: { color: cores.text, fontSize: 19, fontWeight: '700', textAlign: 'center' },
+  descricaoDespedida: { color: cores.textSecondary, fontSize: 14, lineHeight: 21, textAlign: 'center' },
+  botaoConta: { padding: 16, backgroundColor: cores.backgroundElement, borderRadius: 20, flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 16, borderWidth: 1, borderColor: cores.backgroundSelected },
   textoBotaoConta: { flex: 1, fontWeight: '600', fontSize: 14 },
   marca: { alignItems: 'center', marginTop: 40, gap: 8 },
   nomeMarca: { color: cores.text, fontSize: 16, fontWeight: '800' },

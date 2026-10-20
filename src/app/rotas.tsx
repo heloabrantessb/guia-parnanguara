@@ -1,3 +1,4 @@
+import { MascoteCaranguejo } from '@/components/identidade/MascoteCaranguejo';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator, FlatList, Modal, RefreshControl, StyleSheet,
@@ -144,7 +145,7 @@ export default function TelaRotas() {
     return (
       <SafeAreaView style={[estilos.tela, { backgroundColor: cores.background }]} edges={['top']}>
         <View style={estilos.estadoVisitante}>
-          <Ionicons name="map-outline" size={64} color={cores.principal} />
+          <MascoteCaranguejo pose="mapa" tamanho={152} />
           <Text style={[estilos.titulo, { color: cores.text }]}>Seus passeios, do seu jeito</Text>
           <Text style={[estilos.descricao, { color: cores.textSecondary }]}>
             Entre na sua conta para criar roteiros e consultar suas paradas em Paranaguá.
@@ -198,7 +199,7 @@ export default function TelaRotas() {
           <ActivityIndicator size="large" color={cores.principal} accessibilityLabel="Carregando roteiros" />
         ) : !mensagemErro ? (
           <View style={[estilos.estadoVazio, { backgroundColor: cores.backgroundElement }]}>
-            <Ionicons name="trail-sign-outline" size={44} color={cores.textSecondary} />
+            <MascoteCaranguejo pose="mapa" tamanho={112} />
             <Text style={[estilos.nomeRota, { color: cores.text }]}>Seu próximo passeio começa aqui</Text>
             <Text style={[estilos.descricao, { color: cores.textSecondary }]}>Crie seu primeiro roteiro para organizar a visita.</Text>
           </View>
