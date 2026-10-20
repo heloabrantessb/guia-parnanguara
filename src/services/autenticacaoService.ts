@@ -10,10 +10,16 @@ import {
 const CHAVE_TOKEN = '@guia_parnanguara:token';
 const CHAVE_USUARIO = '@guia_parnanguara:usuario';
 
+function formatarCaminhoAutenticacao(sufixo: string): string {
+  const urlBase = (process.env.EXPO_PUBLIC_API_URL || '').replace(/\/+$/, '');
+  const prefixo = urlBase.endsWith('/v1') ? '/usuarios' : '/v1/usuarios';
+  return `${prefixo}${sufixo}`;
+}
+
 export async function realizarLogin(
   credenciais: CredenciaisLogin
 ): Promise<RespostaLogin> {
-  return request<RespostaLogin>('/usuarios/login', {
+  return request<RespostaLogin>(formatarCaminhoAutenticacao('/login'), {
     method: 'POST',
     body: JSON.stringify(credenciais),
   });
@@ -22,7 +28,7 @@ export async function realizarLogin(
 export async function cadastrarUsuario(
   dados: DadosCadastro
 ): Promise<Usuario> {
-  return request<Usuario>('/usuarios/registro', {
+  return request<Usuario>(formatarCaminhoAutenticacao('/registro'), {
     method: 'POST',
     body: JSON.stringify(dados),
   });
