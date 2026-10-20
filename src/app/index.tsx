@@ -13,6 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 
 import { useAutenticacao } from '@/contexts/AutenticacaoContext';
+import { MascoteCaranguejo } from '@/components/identidade/MascoteCaranguejo';
 import { SimboloLitoraneo } from '@/components/identidade/SimboloLitoraneo';
 import { DestaqueCard } from '@/components/cards/destaqueCard';
 import { LocalCard } from '@/components/cards/LocalCard';
@@ -230,7 +231,10 @@ export default function TelaHome() {
         <View style={styles.conviteLitoral}>
           <View style={styles.solDecorativo} pointerEvents="none" />
           <Text style={styles.sobretituloLitoral}>TURISMO · CULTURA · NATUREZA</Text>
-          <Text style={styles.tituloLitoral}>Seu próximo destino{ '\n' }tem alma caiçara.</Text>
+          <View style={styles.apresentacaoMascote}>
+            <Text style={styles.tituloLitoral}>Seu próximo destino tem alma caiçara.</Text>
+            <MascoteCaranguejo tamanho={112} />
+          </View>
           <Text style={styles.descricaoLitoral}>Histórias, sabores e paisagens. Explore Paranaguá no seu ritmo.</Text>
           <View style={styles.localizacaoLitoral}>
             <Ionicons name="location-outline" size={14} color={cores.detalheDestaque} />
@@ -541,7 +545,8 @@ const criarEstilos = (cores: CoresTema) => StyleSheet.create({
   conviteLitoral: { backgroundColor: cores.destaque, borderRadius: 28, padding: 24, overflow: 'hidden', marginBottom: 24 },
   solDecorativo: { position: 'absolute', right: -32, top: -24, width: 150, height: 150, borderRadius: 75, backgroundColor: '#D9A45B', opacity: 0.14 },
   sobretituloLitoral: { color: '#F2C27C', fontSize: 10, letterSpacing: 1.7, fontWeight: '700', marginBottom: 16 },
-  tituloLitoral: { color: cores.sobreDestaque, fontSize: 30, lineHeight: 36, fontWeight: '800', letterSpacing: -0.8 },
+  apresentacaoMascote: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  tituloLitoral: { flex: 1, color: cores.sobreDestaque, fontSize: 26, lineHeight: 32, fontWeight: '800', letterSpacing: -0.8 },
   descricaoLitoral: { color: cores.detalheDestaque, fontSize: 14, lineHeight: 22, marginTop: 12, maxWidth: 320 },
   localizacaoLitoral: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 24 },
   textoLocalizacao: { color: cores.detalheDestaque, fontSize: 12, fontWeight: '500' },

@@ -11,7 +11,7 @@ import {
   ScrollView,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { SimboloLitoraneo } from '@/components/identidade/SimboloLitoraneo';
+import { MascoteCaranguejo } from '@/components/identidade/MascoteCaranguejo';
 import { useAutenticacao } from '@/contexts/AutenticacaoContext';
 import { CoresTema } from '@/utils/theme';
 import { useTema } from '@/contexts/TemaContext';
@@ -65,7 +65,7 @@ export function TelaLogin({ aoNavegarCadastro }: TelaLoginProps) {
         keyboardShouldPersistTaps="handled"
       >
         <View style={styles.cabecalho}>
-          <View style={{ marginBottom: 20 }}><SimboloLitoraneo tamanho={88} /></View>
+          <View style={{ marginBottom: 20 }}><MascoteCaranguejo tamanho={140} /></View>
           <Text style={[styles.titulo, { color: cores.text }]}>
             Guia Parnanguara
           </Text>
