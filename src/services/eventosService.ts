@@ -2,7 +2,7 @@ import { request } from './api';
 import { Evento } from '@/types/evento';
 
 function formatarCaminhoEventos(caminho: string): string {
-  const urlBase = process.env.EXPO_PUBLIC_API_URL || '';
+  const urlBase = (process.env.EXPO_PUBLIC_API_URL || '').replace(/\/+$/, '');
   const basePossuiV1 = urlBase.toLowerCase().endsWith('/v1');
   const caminhoPossuiV1 = caminho.toLowerCase().startsWith('/v1');
 
