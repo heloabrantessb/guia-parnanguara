@@ -66,9 +66,31 @@ teste('não faz chamadas sem token', async () => {
   const servico = carregarServico('http://api.exemplo', async () => verificar.fail('Chamada sem autenticação'));
   await verificar.rejects(servico.listarRotas(' '), /Entre na sua conta/);
   await verificar.rejects(servico.criarRota('Passeio', ''), /Entre na sua conta/);
+  await verificar.rejects(servico.criarRotaManual('Passeio', [1], ''), /Entre na sua conta/);
   await verificar.rejects(servico.buscarRotaPorId(1, ''), /Entre na sua conta/);
   await verificar.rejects(servico.renomearRota(1, 'Passeio', ''), /Entre na sua conta/);
   await verificar.rejects(servico.removerRota(1, ''), /Entre na sua conta/);
+});
+
+teste('cria roteiro manual com paradas na ordem escolhida em uma chamada autenticada', async () => {
+  const chamadas = [];
+  const rota = { id: 7, titulo: 'Passeio', itens: [] };
+  const servico = carregarServico('http://api.exemplo/v1/', async (caminho, opcoes) => {
+    chamadas.push({ caminho, opcoes });
+    return rota;
+  });
+  verificar.equal(await servico.criarRotaManual('Passeio', [8, 3], 'token-ficticio'), rota);
+  verificar.equal(chamadas.length, 1);
+  verificar.equal(chamadas[0].caminho, '/rotas/');
+  verificar.equal(chamadas[0].opcoes.method, 'POST');
+  verificar.equal(chamadas[0].opcoes.headers.Authorization, 'Bearer token-ficticio');
+  verificar.deepEqual(JSON.parse(chamadas[0].opcoes.body), { titulo: 'Passeio', atrativo_ids: [8, 3] });
+});
+
+teste('criação manual preserva falha da API sem simular roteiro salvo', async () => {
+  const erroApi = new Error('Um ou mais atrativos não estão disponíveis.');
+  const servico = carregarServico('http://api.exemplo', async () => { throw erroApi; });
+  await verificar.rejects(servico.criarRotaManual('Passeio', [8], 'token-ficticio'), (erro) => erro === erroApi);
 });
 
 teste('preserva falhas da API em vez de simular sucesso', async () => {

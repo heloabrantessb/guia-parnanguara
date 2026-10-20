@@ -8,7 +8,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAutenticacao } from '@/contexts/AutenticacaoContext';
 import { DetalheRotaModal } from '@/components/rotas/DetalheRotaModal';
 import { FormularioRotaModal } from '@/components/rotas/FormularioRotaModal';
-import { criarRota, listarRotas, removerRota, renomearRota } from '@/services/rotasService';
+import { RoteiroManualModal } from '@/components/rotas/RoteiroManualModal';
+import { criarRotaManual, listarRotas, removerRota, renomearRota } from '@/services/rotasService';
 import { Rota } from '@/types/rota';
 import { Colors } from '@/utils/theme';
 
@@ -23,6 +24,7 @@ export default function TelaRotas() {
   const [tentativaCarregamento, definirTentativaCarregamento] = useState(0);
   const [rotaSelecionadaId, definirRotaSelecionadaId] = useState<number | null>(null);
   const [formularioVisivel, definirFormularioVisivel] = useState(false);
+  const [roteiroManualVisivel, definirRoteiroManualVisivel] = useState(false);
   const [rotaEmEdicao, definirRotaEmEdicao] = useState<Rota | null>(null);
   const [rotaParaExcluir, definirRotaParaExcluir] = useState<Rota | null>(null);
   const [estaExcluindo, definirEstaExcluindo] = useState(false);
@@ -66,8 +68,7 @@ export default function TelaRotas() {
   }, []);
 
   function abrirCriacaoRota() {
-    definirRotaEmEdicao(null);
-    definirFormularioVisivel(true);
+    definirRoteiroManualVisivel(true);
   }
 
   function abrirEdicaoRota(rota: Rota) {
@@ -77,15 +78,25 @@ export default function TelaRotas() {
 
   async function salvarRota(titulo: string) {
     if (!tokenAcesso) throw new Error('Entre na sua conta para salvar roteiros.');
-    const rotaSalva = rotaEmEdicao
-      ? await renomearRota(rotaEmEdicao.id, titulo, tokenAcesso)
-      : await criarRota(titulo, tokenAcesso);
+    if (!rotaEmEdicao) return;
+    const rotaSalva = await renomearRota(rotaEmEdicao.id, titulo, tokenAcesso);
     versaoLista.current += 1;
     definirRotas((rotasAtuais) => rotaEmEdicao
       ? rotasAtuais.map((rota) => rota.id === rotaSalva.id ? rotaSalva : rota)
       : [rotaSalva, ...rotasAtuais]);
     definirMensagemErro(null);
     definirFormularioVisivel(false);
+    definirTentativaCarregamento((tentativa) => tentativa + 1);
+  }
+
+  async function salvarRotaManual(titulo: string, atrativoIds: number[]) {
+    if (!tokenAcesso) throw new Error('Entre na sua conta para salvar roteiros.');
+    const rotaSalva = await criarRotaManual(titulo, atrativoIds, tokenAcesso);
+    versaoLista.current += 1;
+    definirRotas((rotasAtuais) => [rotaSalva, ...rotasAtuais]);
+    definirMensagemErro(null);
+    definirRoteiroManualVisivel(false);
+    definirRotaSelecionadaId(rotaSalva.id);
     definirTentativaCarregamento((tentativa) => tentativa + 1);
   }
 
@@ -153,7 +164,7 @@ export default function TelaRotas() {
             </Text>
             <TouchableOpacity onPress={abrirCriacaoRota} style={estilos.botaoPrincipal} accessibilityRole="button">
               <Ionicons name="add" size={22} color="#FFFFFF" />
-              <Text style={estilos.textoBotaoPrincipal}>Criar roteiro</Text>
+              <Text style={estilos.textoBotaoPrincipal}>Montar roteiro manual</Text>
             </TouchableOpacity>
             {mensagemErro && (
               <View style={estilos.avisoErro}>
@@ -208,6 +219,10 @@ export default function TelaRotas() {
           </View>
         )}
       />
+      {roteiroManualVisivel && <RoteiroManualModal
+        aoSalvar={salvarRotaManual}
+        aoFechar={() => definirRoteiroManualVisivel(false)}
+      />}
       {formularioVisivel && <FormularioRotaModal
         tituloInicial={rotaEmEdicao?.titulo ?? ''}
         tituloFormulario={rotaEmEdicao ? 'Renomear roteiro' : 'Criar roteiro'}

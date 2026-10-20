@@ -34,6 +34,18 @@ export async function criarRota(titulo: string, tokenAcesso: string): Promise<Ro
   });
 }
 
+export async function criarRotaManual(
+  titulo: string,
+  atrativoIds: number[],
+  tokenAcesso: string
+): Promise<Rota> {
+  return request<Rota>(formatarCaminhoRotas('/'), {
+    method: 'POST',
+    headers: criarCabecalhosAutenticacao(tokenAcesso),
+    body: JSON.stringify({ titulo, atrativo_ids: atrativoIds }),
+  });
+}
+
 export async function renomearRota(
   rotaId: number,
   titulo: string,
