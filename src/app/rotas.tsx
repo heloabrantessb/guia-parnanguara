@@ -9,8 +9,9 @@ import { useAutenticacao } from '@/contexts/AutenticacaoContext';
 import { DetalheRotaModal } from '@/components/rotas/DetalheRotaModal';
 import { FormularioRotaModal } from '@/components/rotas/FormularioRotaModal';
 import { RoteiroManualModal } from '@/components/rotas/RoteiroManualModal';
-import { criarRotaManual, listarRotas, removerRota, renomearRota } from '@/services/rotasService';
-import { Rota } from '@/types/rota';
+import { GerarRoteiroModal } from '@/components/rotas/GerarRoteiroModal';
+import { criarRotaManual, gerarRota, listarRotas, removerRota, renomearRota } from '@/services/rotasService';
+import { Rota, SolicitacaoGeracaoRota } from '@/types/rota';
 import { Colors } from '@/utils/theme';
 
 export default function TelaRotas() {
@@ -25,6 +26,7 @@ export default function TelaRotas() {
   const [rotaSelecionadaId, definirRotaSelecionadaId] = useState<number | null>(null);
   const [formularioVisivel, definirFormularioVisivel] = useState(false);
   const [roteiroManualVisivel, definirRoteiroManualVisivel] = useState(false);
+  const [geracaoVisivel, definirGeracaoVisivel] = useState(false);
   const [rotaEmEdicao, definirRotaEmEdicao] = useState<Rota | null>(null);
   const [rotaParaExcluir, definirRotaParaExcluir] = useState<Rota | null>(null);
   const [estaExcluindo, definirEstaExcluindo] = useState(false);
@@ -100,6 +102,17 @@ export default function TelaRotas() {
     definirTentativaCarregamento((tentativa) => tentativa + 1);
   }
 
+  async function gerarRoteiroAutomatico(solicitacao: SolicitacaoGeracaoRota) {
+    if (!tokenAcesso) throw new Error('Entre na sua conta para gerar roteiros.');
+    const rotaGerada = await gerarRota(solicitacao, tokenAcesso);
+    versaoLista.current += 1;
+    definirRotas((rotasAtuais) => [rotaGerada, ...rotasAtuais]);
+    definirMensagemErro(null);
+    definirGeracaoVisivel(false);
+    definirRotaSelecionadaId(rotaGerada.id);
+    definirTentativaCarregamento((tentativa) => tentativa + 1);
+  }
+
   async function excluirRota() {
     if (!rotaParaExcluir || !tokenAcesso || estaExcluindo) return;
     definirEstaExcluindo(true);
@@ -162,6 +175,10 @@ export default function TelaRotas() {
             <Text style={[estilos.descricao, { color: cores.textSecondary }]}>
               Organize seus próximos passeios por Paranaguá.
             </Text>
+            <TouchableOpacity onPress={() => definirGeracaoVisivel(true)} style={estilos.botaoPrincipal} accessibilityRole="button">
+              <Ionicons name="sparkles-outline" size={22} color="#FFFFFF" />
+              <Text style={estilos.textoBotaoPrincipal}>Gerar roteiro para mim</Text>
+            </TouchableOpacity>
             <TouchableOpacity onPress={abrirCriacaoRota} style={estilos.botaoPrincipal} accessibilityRole="button">
               <Ionicons name="add" size={22} color="#FFFFFF" />
               <Text style={estilos.textoBotaoPrincipal}>Montar roteiro manual</Text>
@@ -198,6 +215,7 @@ export default function TelaRotas() {
                 <Text style={[estilos.nomeRota, { color: cores.text }]}>{rota.titulo}</Text>
                 <Text style={[estilos.descricao, { color: cores.textSecondary }]}>
                   {rota.itens.length === 1 ? '1 parada' : `${rota.itens.length} paradas`}
+                  {rota.duracao_estimada_minutos != null ? ` · ${rota.duracao_estimada_minutos} min estimados` : ''}
                 </Text>
               </View>
               <Ionicons name="chevron-forward" size={20} color={cores.textSecondary} />
@@ -219,6 +237,11 @@ export default function TelaRotas() {
           </View>
         )}
       />
+      {geracaoVisivel && <GerarRoteiroModal
+        tokenAcesso={tokenAcesso}
+        aoGerar={gerarRoteiroAutomatico}
+        aoFechar={() => definirGeracaoVisivel(false)}
+      />}
       {roteiroManualVisivel && <RoteiroManualModal
         aoSalvar={salvarRotaManual}
         aoFechar={() => definirRoteiroManualVisivel(false)}

@@ -16,6 +16,12 @@ interface DetalheRotaModalProps {
   aoFechar: () => void;
 }
 
+function formatarHorarioPrevisto(dataIso: string): string {
+  return new Date(dataIso).toLocaleString('pt-BR', {
+    timeZone: 'America/Sao_Paulo', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit',
+  });
+}
+
 export function DetalheRotaModal({ rotaId, tokenAcesso, aoFechar }: DetalheRotaModalProps) {
   const esquemaCores = useColorScheme();
   const cores = Colors[esquemaCores === 'dark' ? 'dark' : 'light'];
@@ -93,6 +99,17 @@ export function DetalheRotaModal({ rotaId, tokenAcesso, aoFechar }: DetalheRotaM
                   {paradasOrdenadas.length === 1 ? '1 parada no seu passeio' :
                     `${paradasOrdenadas.length} paradas no seu passeio`}
                 </Text>
+                {rota?.duracao_estimada_minutos != null && <View>
+                  <Text style={[estilos.descricao, { color: cores.text }]}>
+                    {rota.duracao_estimada_minutos} min estimados de {rota.tempo_disponivel_minutos} min disponíveis
+                  </Text>
+                  {rota.inicio_em && <Text style={[estilos.descricao, { color: cores.textSecondary }]}>
+                    Início previsto: {formatarHorarioPrevisto(rota.inicio_em)}
+                  </Text>}
+                  <Text style={[estilos.descricao, { color: cores.textSecondary }]}>
+                    Caminhada estimada pela distância em linha reta. O tempo até a primeira parada e o retorno não estão incluídos. Os horários são previsões do momento em que o roteiro foi gerado.
+                  </Text>
+                </View>}
               </View>
             }
             ListEmptyComponent={
@@ -122,6 +139,17 @@ export function DetalheRotaModal({ rotaId, tokenAcesso, aoFechar }: DetalheRotaM
                     </Text>
                     <Text style={[estilos.descricao, { color: cores.textSecondary }]}>{atrativo.endereco}</Text>
                     <Text style={[estilos.descricao, { color: cores.textSecondary }]}>{atrativo.descricao}</Text>
+                    {parada.chegada_em && parada.saida_em && <View>
+                      <Text style={[estilos.descricao, { color: cores.text }]}>
+                        Chegada: {formatarHorarioPrevisto(parada.chegada_em)}
+                      </Text>
+                      <Text style={[estilos.descricao, { color: cores.text }]}>
+                        Saída: {formatarHorarioPrevisto(parada.saida_em)}
+                      </Text>
+                      <Text style={[estilos.descricao, { color: cores.textSecondary }]}>
+                        Visita: {parada.duracao_visita_minutos} min · Caminhada: {parada.deslocamento_minutos} min · Espera: {parada.espera_minutos} min
+                      </Text>
+                    </View>}
                     <Text style={estilos.preco}>{formatarValorEntrada(atrativo.valor_entrada)}</Text>
                   </View>
                 </View>
