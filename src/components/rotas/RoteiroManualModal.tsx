@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react';
 import {
   ActivityIndicator, Modal, ScrollView, StyleSheet, Text, TextInput,
-  TouchableOpacity, useColorScheme, View,
+  TouchableOpacity, View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { listarLocais } from '@/services/locaisService';
 import { listarEventos } from '@/services/eventosService';
 import { AtrativoRota } from '@/types/rota';
-import { Colors } from '@/utils/theme';
+import { CoresTema } from '@/utils/theme';
+import { useTema } from '@/contexts/TemaContext';
 
 interface RoteiroManualModalProps {
   aoSalvar: (titulo: string, atrativoIds: number[]) => Promise<void>;
@@ -15,8 +16,8 @@ interface RoteiroManualModalProps {
 }
 
 export function RoteiroManualModal({ aoSalvar, aoFechar }: RoteiroManualModalProps) {
-  const esquemaCores = useColorScheme();
-  const cores = Colors[esquemaCores === 'dark' ? 'dark' : 'light'];
+  const { cores } = useTema();
+  const estilos = criarEstilos(cores);
   const [titulo, definirTitulo] = useState('');
   const [atrativos, definirAtrativos] = useState<AtrativoRota[]>([]);
   const [atrativoIds, definirAtrativoIds] = useState<number[]>([]);
@@ -96,7 +97,7 @@ export function RoteiroManualModal({ aoSalvar, aoFechar }: RoteiroManualModalPro
             </TouchableOpacity>;
           })}
           <Text style={[estilos.subtitulo, { color: cores.text }]}>Locais e eventos disponíveis</Text>
-          {estaCarregando ? <ActivityIndicator accessibilityLabel="Carregando atrativos" color="#0284C7" /> : erroCarregamento ? (
+          {estaCarregando ? <ActivityIndicator accessibilityLabel="Carregando atrativos" color={cores.principal} /> : erroCarregamento ? (
             <View>
               <Text style={estilos.erro} accessibilityRole="alert">{erroCarregamento}</Text>
               <TouchableOpacity onPress={() => definirTentativaCarregamento((tentativa) => tentativa + 1)} accessibilityRole="button" style={estilos.botao}>
@@ -108,7 +109,7 @@ export function RoteiroManualModal({ aoSalvar, aoFechar }: RoteiroManualModalPro
             return <TouchableOpacity key={atrativo.id} onPress={() => alternarAtrativo(atrativo.id)}
               disabled={estaSalvando || (!estaSelecionado && atrativoIds.length >= 100)}
               accessibilityRole="checkbox" accessibilityState={{ checked: estaSelecionado, disabled: estaSalvando || (!estaSelecionado && atrativoIds.length >= 100) }}
-              style={[estilos.cartao, { borderColor: estaSelecionado ? '#0284C7' : cores.backgroundSelected }]}>
+              style={[estilos.cartao, { borderColor: estaSelecionado ? cores.principal : cores.backgroundSelected }]}>
               <Text style={[estilos.nomeParada, { color: cores.text }]}>{estaSelecionado ? 'Selecionado: ' : ''}{atrativo.nome}</Text>
               <Text style={{ color: cores.textSecondary }}>{atrativo.endereco}</Text>
             </TouchableOpacity>;
@@ -127,7 +128,7 @@ export function RoteiroManualModal({ aoSalvar, aoFechar }: RoteiroManualModalPro
   );
 }
 
-const estilos = StyleSheet.create({
+const criarEstilos = (cores: CoresTema) => StyleSheet.create({
   tela: { flex: 1 },
   conteudo: { padding: 24, gap: 16, width: '100%', maxWidth: 800, alignSelf: 'center' },
   titulo: { fontSize: 26, fontWeight: '800' },
@@ -137,9 +138,9 @@ const estilos = StyleSheet.create({
   parada: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 8 },
   nomeParada: { flex: 1, fontSize: 16, fontWeight: '600' },
   cartao: { padding: 16, gap: 8, borderWidth: 1, borderRadius: 12 },
-  acao: { color: '#0284C7', fontWeight: '700' },
-  erro: { color: '#DC2626', lineHeight: 22 },
+  acao: { color: cores.principal, fontWeight: '700' },
+  erro: { color: cores.perigo, lineHeight: 22 },
   botao: { padding: 16 },
-  botaoPrincipal: { padding: 16, backgroundColor: '#0284C7', alignItems: 'center', borderRadius: 12 },
+  botaoPrincipal: { padding: 16, backgroundColor: cores.acao, alignItems: 'center', borderRadius: 12 },
   textoBotao: { color: '#FFFFFF', fontWeight: '700', fontSize: 16 },
 });

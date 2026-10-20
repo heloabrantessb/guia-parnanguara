@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, StyleSheet, View, useColorScheme } from 'react-native';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { TelaLogin } from './TelaLogin';
 import { TelaCadastro } from './TelaCadastro';
 import { TelaApresentacao } from './TelaApresentacao';
@@ -7,7 +7,7 @@ import {
   buscarApresentacaoConcluida,
   salvarApresentacaoConcluida,
 } from '@/services/apresentacaoService';
-import { Colors } from '@/utils/theme';
+import { useTema } from '@/contexts/TemaContext';
 
 type TelaAtiva = 'login' | 'cadastro';
 
@@ -16,8 +16,7 @@ export function FluxoAutenticacao() {
   const [apresentacaoConcluida, definirApresentacaoConcluida] = useState<
     boolean | null
   >(null);
-  const esquemaCores = useColorScheme();
-  const cores = Colors[esquemaCores === 'dark' ? 'dark' : 'light'];
+  const { cores } = useTema();
 
   useEffect(() => {
     let estaMontado = true;
@@ -46,7 +45,7 @@ export function FluxoAutenticacao() {
   if (apresentacaoConcluida === null) {
     return (
       <View style={[estilos.carregamento, { backgroundColor: cores.background }]}>
-        <ActivityIndicator color="#0284C7" accessibilityLabel="Carregando apresentação" />
+        <ActivityIndicator color={cores.principal} accessibilityLabel="Carregando apresentação" />
       </View>
     );
   }

@@ -1,28 +1,51 @@
-/**
- * Below are the colors that are used in the app. The colors are defined in the light and dark mode.
- * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
- */
-
 import '@/global.css';
 
 import { Platform } from 'react-native';
 
+// A referência litorânea orienta os acentos; os tons de leitura variam por tema.
+export const identidade = {
+  petroleo: '#126B78',
+  mangue: '#32866A',
+  coral: '#D65A4A',
+  areia: '#D9A45B',
+} as const;
+
 export const Colors = {
   light: {
-    text: '#000000',
-    background: '#ffffff',
-    backgroundElement: '#F0F0F3',
-    backgroundSelected: '#E0E1E6',
-    textSecondary: '#60646C',
+    text: '#123F47',
+    background: '#FAF7F2',
+    backgroundElement: '#FFFFFF',
+    backgroundSelected: '#DFE7E1',
+    textSecondary: '#536D70',
+    principal: '#126B78',
+    acao: '#126B78',
+    marcaSuave: '#E4F0EC',
+    sucesso: '#277257',
+    perigo: '#B33E35',
+    perigoSuave: '#FBEAE5',
+    destaque: '#084C59',
+    sobreDestaque: '#FFFFFF',
+    detalheDestaque: '#C8E6E2',
   },
   dark: {
-    text: '#ffffff',
-    background: '#000000',
-    backgroundElement: '#212225',
-    backgroundSelected: '#2E3135',
-    textSecondary: '#B0B4BA',
+    text: '#EDF5F1',
+    background: '#0C2026',
+    backgroundElement: '#163139',
+    backgroundSelected: '#2E4B51',
+    textSecondary: '#AEC5C5',
+    principal: '#80D0D3',
+    acao: '#126B78',
+    marcaSuave: '#20443F',
+    sucesso: '#85CDB0',
+    perigo: '#FFA699',
+    perigoSuave: '#452D2C',
+    destaque: '#123B46',
+    sobreDestaque: '#FFFFFF',
+    detalheDestaque: '#C8E6E2',
   },
 } as const;
+
+export type CoresTema = { [Chave in keyof typeof Colors.light]: string };
 
 export type ThemeColor = keyof typeof Colors.light & keyof typeof Colors.dark;
 

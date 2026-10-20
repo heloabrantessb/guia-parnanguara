@@ -9,6 +9,8 @@ import {
   StyleProp,
   ViewStyle,
 } from 'react-native';
+import { useTema } from '@/contexts/TemaContext';
+import { CoresTema } from '@/utils/theme';
 import { Ionicons } from '@expo/vector-icons';
 
 export interface DestaqueCardProps {
@@ -22,7 +24,7 @@ export interface DestaqueCardProps {
   image?: ImageSourcePropType | string;
   onPress?: () => void;
   style?: StyleProp<ViewStyle>;
-  width?: number | string;
+  width?: ViewStyle['width'];
   imageHeight?: number;
   testID?: string;
 }
@@ -35,20 +37,22 @@ export function DestaqueCard({
   category,
   distance,
   subtitle,
-  rating = 4.8,
+  rating,
   image = DEFAULT_IMAGE,
   onPress,
   style,
-  width = 208,
-  imageHeight = 128,
+  width = 260,
+  imageHeight = 180,
   testID,
 }: DestaqueCardProps) {
+  const { cores } = useTema();
+  const styles = criarEstilos(cores);
   const displayTitle = title || name || 'Ponto Turístico Em Destaque';
 
   const displaySubtitle =
     subtitle ||
     [category, distance].filter(Boolean).join(' • ') ||
-    'Histórico • 0.5 km';
+    'Conheça Paranaguá';
 
   const imageSource: ImageSourcePropType =
     typeof image === 'string' ? { uri: image } : image;
@@ -57,11 +61,11 @@ export function DestaqueCard({
     <Pressable
       onPress={onPress}
       accessibilityRole="button"
-      accessibilityLabel={`${displayTitle}, avaliação ${rating}`}
+      accessibilityLabel={rating ? `${displayTitle}, avaliação ${rating}` : displayTitle}
       testID={testID}
       style={({ pressed }) => [
         styles.card,
-        { width: width as any },
+        { width },
         pressed && styles.cardPressed,
         style,
       ]}
@@ -76,6 +80,7 @@ export function DestaqueCard({
       </View>
 
       <View style={styles.infoContainer}>
+        {category && <Text style={styles.categoria} numberOfLines={1}>{category}</Text>}
         <Text style={styles.title} numberOfLines={1} ellipsizeMode="tail">
           {displayTitle}
         </Text>
@@ -84,7 +89,7 @@ export function DestaqueCard({
           <Ionicons
             name="location-outline"
             size={14}
-            color="#64748B"
+            color={cores.textSecondary}
             style={styles.locationIcon}
           />
           <Text style={styles.locationText} numberOfLines={1} ellipsizeMode="tail">
@@ -96,12 +101,12 @@ export function DestaqueCard({
   );
 }
 
-const styles = StyleSheet.create({
+const criarEstilos = (cores: CoresTema) => StyleSheet.create({
   card: {
-    borderRadius: 16,
-    backgroundColor: '#FFFFFF',
+    borderRadius: 24,
+    backgroundColor: cores.backgroundElement,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
+    borderColor: cores.backgroundSelected,
     overflow: 'hidden',
     ...Platform.select({
       ios: {
@@ -125,7 +130,7 @@ const styles = StyleSheet.create({
   imageContainer: {
     position: 'relative',
     width: '100%',
-    backgroundColor: '#F1F5F9',
+    backgroundColor: cores.marcaSuave,
   },
   image: {
     width: '100%',
@@ -137,7 +142,7 @@ const styles = StyleSheet.create({
     left: 10,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: cores.backgroundElement,
     paddingHorizontal: 8,
     paddingVertical: 3.5,
     borderRadius: 9999,
@@ -167,10 +172,11 @@ const styles = StyleSheet.create({
     paddingTop: 12,
     paddingBottom: 14,
   },
+  categoria: { color: cores.principal, fontSize: 10, fontWeight: '700', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 8 },
   title: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#0F172A',
+    color: cores.text,
     marginBottom: 4,
     letterSpacing: -0.2,
   },
@@ -184,7 +190,7 @@ const styles = StyleSheet.create({
   },
   locationText: {
     fontSize: 12.5,
-    color: '#64748B',
+    color: cores.textSecondary,
     fontWeight: '400',
     flexShrink: 1,
   },

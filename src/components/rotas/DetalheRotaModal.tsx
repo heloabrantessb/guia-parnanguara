@@ -1,14 +1,15 @@
 import { useEffect, useState } from 'react';
 import {
   ActivityIndicator, FlatList, Image, Modal, StyleSheet,
-  Text, TouchableOpacity, useColorScheme, View,
+  Text, TouchableOpacity, View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { buscarRotaPorId } from '@/services/rotasService';
 import { Rota } from '@/types/rota';
 import { formatarValorEntrada, resolverUrlImagem } from '@/utils/formatadores';
-import { Colors } from '@/utils/theme';
+import { CoresTema } from '@/utils/theme';
+import { useTema } from '@/contexts/TemaContext';
 
 interface DetalheRotaModalProps {
   rotaId: number;
@@ -23,8 +24,8 @@ function formatarHorarioPrevisto(dataIso: string): string {
 }
 
 export function DetalheRotaModal({ rotaId, tokenAcesso, aoFechar }: DetalheRotaModalProps) {
-  const esquemaCores = useColorScheme();
-  const cores = Colors[esquemaCores === 'dark' ? 'dark' : 'light'];
+  const { cores } = useTema();
+  const estilos = criarEstilos(cores);
   const [rota, definirRota] = useState<Rota | null>(null);
   const [estaCarregando, definirEstaCarregando] = useState(true);
   const [mensagemErro, definirMensagemErro] = useState<string | null>(null);
@@ -70,7 +71,7 @@ export function DetalheRotaModal({ rotaId, tokenAcesso, aoFechar }: DetalheRotaM
         </View>
         {estaCarregando ? (
           <View style={estilos.estado}>
-            <ActivityIndicator size="large" color="#0284C7" accessibilityLabel="Carregando roteiro" />
+            <ActivityIndicator size="large" color={cores.principal} accessibilityLabel="Carregando roteiro" />
           </View>
         ) : mensagemErro ? (
           <View style={estilos.estado}>
@@ -162,7 +163,7 @@ export function DetalheRotaModal({ rotaId, tokenAcesso, aoFechar }: DetalheRotaM
   );
 }
 
-const estilos = StyleSheet.create({
+const criarEstilos = (cores: CoresTema) => StyleSheet.create({
   tela: { flex: 1 },
   cabecalho: { paddingHorizontal: 16, paddingVertical: 8 },
   botaoVoltar: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 12 },
@@ -175,9 +176,9 @@ const estilos = StyleSheet.create({
   parada: { borderWidth: 1, borderRadius: 18, overflow: 'hidden', marginBottom: 20 },
   imagem: { width: '100%', height: 160, resizeMode: 'cover' },
   conteudoParada: { padding: 20 },
-  numeroParada: { color: '#0284C7', fontSize: 12, fontWeight: '700', marginBottom: 8 },
+  numeroParada: { color: cores.principal, fontSize: 12, fontWeight: '700', marginBottom: 8 },
   nomeParada: { fontSize: 21, fontWeight: '700' },
-  preco: { color: '#0284C7', fontSize: 14, fontWeight: '600', marginTop: 16 },
+  preco: { color: cores.principal, fontSize: 14, fontWeight: '600', marginTop: 16 },
   botaoTentarNovamente: { padding: 16, marginTop: 12 },
-  textoTentarNovamente: { color: '#0284C7', fontWeight: '700' },
+  textoTentarNovamente: { color: cores.principal, fontWeight: '700' },
 });

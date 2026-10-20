@@ -1,21 +1,49 @@
 import { NativeTabs } from 'expo-router/unstable-native-tabs';
-import { useColorScheme } from 'react-native';
+import { Platform } from 'react-native';
 import { MaterialIcons } from "@expo/vector-icons";
 
-import { Colors } from '@/utils/theme';
-import { VectorIcon } from 'expo-router';
+import { useTema } from '@/contexts/TemaContext';
+import { Tabs, VectorIcon } from 'expo-router';
+
+const abas = [
+  { nome: 'index', titulo: 'Início', icone: 'home' },
+  { nome: 'explorar', titulo: 'Explorar', icone: 'explore' },
+  { nome: 'rotas', titulo: 'Rotas', icone: 'route' },
+  { nome: 'eventos', titulo: 'Eventos', icone: 'event' },
+  { nome: 'perfil', titulo: 'Perfil', icone: 'person' },
+] as const;
 
 export default function AppTabs() {
-  const scheme = useColorScheme();
-  const colors = Colors[scheme === 'unspecified' ? 'light' : scheme];
+  const { cores } = useTema();
+
+  // Ícones das abas nativas dependem de renderização indisponível na web.
+  if (Platform.OS === 'web') {
+    return (
+      <Tabs screenOptions={{
+        headerShown: false,
+        tabBarActiveTintColor: cores.principal,
+        tabBarInactiveTintColor: cores.textSecondary,
+        tabBarStyle: { backgroundColor: cores.backgroundElement, borderTopColor: cores.backgroundSelected, height: 72, paddingTop: 8, paddingBottom: 8 },
+        tabBarLabelStyle: { fontSize: 11, fontWeight: '600' },
+      }}>
+        {abas.map((aba) => (
+          <Tabs.Screen key={aba.nome} name={aba.nome} options={{
+            title: aba.titulo,
+            tabBarIcon: ({ color: cor, size: tamanho }) => <MaterialIcons name={aba.icone} color={cor} size={tamanho} />,
+          }} />
+        ))}
+      </Tabs>
+    );
+  }
 
   return (
     <NativeTabs
-      backgroundColor={colors.background}
-      indicatorColor={colors.backgroundElement}
-      labelStyle={{ selected: { color: colors.text } }}>
+      backgroundColor={cores.backgroundElement}
+      tintColor={cores.principal}
+      indicatorColor={cores.marcaSuave}
+      labelStyle={{ color: cores.textSecondary, selected: { color: cores.principal } }}>
       <NativeTabs.Trigger name="index">
-        <NativeTabs.Trigger.Label>Home</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Label>Início</NativeTabs.Trigger.Label>
           <NativeTabs.Trigger.Icon
             src={<VectorIcon family={MaterialIcons} name='home'/>}
             renderingMode="template"

@@ -6,13 +6,13 @@ import {
   TouchableOpacity,
   StyleSheet,
   Platform,
-  useColorScheme,
   StyleProp,
   ViewStyle,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Evento } from '@/types/evento';
-import { Colors } from '@/utils/theme';
+import { CoresTema } from '@/utils/theme';
+import { useTema } from '@/contexts/TemaContext';
 import {
   formatarDataEvento,
   resolverUrlImagem,
@@ -33,8 +33,8 @@ export function EventoCard({
   estilo,
   children,
 }: EventoCardProps) {
-  const scheme = useColorScheme();
-  const cores = Colors[scheme === 'dark' ? 'dark' : 'light'];
+  const { cores } = useTema();
+  const styles = criarEstilos(cores);
 
   const imagemCapa =
     evento.imagens.find((item) => item.imagem_capa) || evento.imagens[0];
@@ -50,7 +50,7 @@ export function EventoCard({
       style={[
         styles.card,
         {
-          backgroundColor: cores.background,
+          backgroundColor: cores.backgroundElement,
           borderColor: cores.backgroundSelected,
         },
         estilo,
@@ -102,10 +102,10 @@ export function EventoCard({
   );
 }
 
-const styles = StyleSheet.create({
+const criarEstilos = (cores: CoresTema) => StyleSheet.create({
   card: {
     width: 230,
-    borderRadius: 14,
+    borderRadius: 22,
     borderWidth: 1,
     overflow: 'hidden',
     marginRight: 14,
@@ -126,8 +126,8 @@ const styles = StyleSheet.create({
   },
   containerImagem: {
     width: '100%',
-    height: 120,
-    backgroundColor: '#F1F5F9',
+    height: 150,
+    backgroundColor: cores.marcaSuave,
     position: 'relative',
   },
   imagem: {
@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 8,
     left: 8,
-    backgroundColor: 'rgba(2, 132, 199, 0.92)',
+    backgroundColor: cores.acao,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,

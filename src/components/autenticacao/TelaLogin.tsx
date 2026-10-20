@@ -9,19 +9,20 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  useColorScheme,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { SimboloLitoraneo } from '@/components/identidade/SimboloLitoraneo';
 import { useAutenticacao } from '@/contexts/AutenticacaoContext';
-import { Colors } from '@/utils/theme';
+import { CoresTema } from '@/utils/theme';
+import { useTema } from '@/contexts/TemaContext';
 
 interface TelaLoginProps {
   aoNavegarCadastro: () => void;
 }
 
 export function TelaLogin({ aoNavegarCadastro }: TelaLoginProps) {
-  const scheme = useColorScheme();
-  const cores = Colors[scheme === 'dark' ? 'dark' : 'light'];
+  const { cores } = useTema();
+  const styles = criarEstilos(cores);
 
   const { entrar, entrarComoVisitante } = useAutenticacao();
 
@@ -64,20 +65,19 @@ export function TelaLogin({ aoNavegarCadastro }: TelaLoginProps) {
         keyboardShouldPersistTaps="handled"
       >
         <View style={styles.cabecalho}>
-          <View style={styles.iconeWrapper}>
-            <Ionicons name="map" size={40} color="#0284C7" />
-          </View>
+          <View style={{ marginBottom: 20 }}><SimboloLitoraneo tamanho={88} /></View>
           <Text style={[styles.titulo, { color: cores.text }]}>
             Guia Parnanguara
           </Text>
           <Text style={[styles.subtitulo, { color: cores.textSecondary }]}>
-            Descubra os encantos e a história de Paranaguá
+            Turismo, cultura e natureza.
+            Seu encontro com o litoral começa aqui.
           </Text>
         </View>
 
         {mensagemErro && (
           <View style={styles.alertaErro}>
-            <Ionicons name="alert-circle" size={18} color="#DC2626" />
+            <Ionicons name="alert-circle" size={18} color={cores.perigo} />
             <Text style={styles.textoErro}>{mensagemErro}</Text>
           </View>
         )}
@@ -214,7 +214,7 @@ export function TelaLogin({ aoNavegarCadastro }: TelaLoginProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const criarEstilos = (cores: CoresTema) => StyleSheet.create({
   container: {
     flex: 1,
   },
@@ -223,6 +223,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 24,
     paddingVertical: 40,
+    width: '100%',
+    maxWidth: 480,
+    alignSelf: 'center',
   },
   cabecalho: {
     alignItems: 'center',
@@ -232,7 +235,7 @@ const styles = StyleSheet.create({
     width: 72,
     height: 72,
     borderRadius: 36,
-    backgroundColor: '#E0F2FE',
+    backgroundColor: cores.marcaSuave,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 16,
@@ -252,7 +255,7 @@ const styles = StyleSheet.create({
   alertaErro: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FEE2E2',
+    backgroundColor: cores.perigoSuave,
     paddingHorizontal: 14,
     paddingVertical: 10,
     borderRadius: 10,
@@ -260,7 +263,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   textoErro: {
-    color: '#B91C1C',
+    color: cores.perigo,
     fontSize: 13,
     flexShrink: 1,
   },
@@ -292,13 +295,13 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   botaoPrincipal: {
-    backgroundColor: '#0284C7',
+    backgroundColor: cores.acao,
     borderRadius: 12,
     height: 48,
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 8,
-    shadowColor: '#0284C7',
+    shadowColor: cores.acao,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
@@ -342,7 +345,7 @@ const styles = StyleSheet.create({
     marginTop: 24,
   },
   textoLink: {
-    color: '#0284C7',
+    color: cores.principal,
     fontWeight: '700',
     fontSize: 14,
   },
