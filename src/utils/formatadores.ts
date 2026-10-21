@@ -71,3 +71,31 @@ export function formatarDataEvento(dataIso: string): string {
     return dataIso;
   }
 }
+
+export function verificarSeEstaAberto(
+  horarioAbertura?: string | null,
+  horarioFechamento?: string | null
+): boolean {
+  if (!horarioAbertura || !horarioFechamento) {
+    return false;
+  }
+
+  try {
+    const agora = new Date();
+    const minutosAtuais = agora.getHours() * 60 + agora.getMinutes();
+
+    const partesAbertura = horarioAbertura.split(':').map(Number);
+    const partesFechamento = horarioFechamento.split(':').map(Number);
+
+    const minutosAbertura = partesAbertura[0] * 60 + (partesAbertura[1] || 0);
+    const minutosFechamento =
+      partesFechamento[0] * 60 + (partesFechamento[1] || 0);
+
+    return (
+      minutosAtuais >= minutosAbertura && minutosAtuais <= minutosFechamento
+    );
+  } catch {
+    return false;
+  }
+}
+

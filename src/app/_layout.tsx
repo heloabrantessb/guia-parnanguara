@@ -1,6 +1,6 @@
 import { DarkTheme, DefaultTheme, ThemeProvider } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import { ActivityIndicator, View, useColorScheme } from 'react-native';
+import { ActivityIndicator, View } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
 
 import '@/global.css';
 import AppTabs from '@/components/app-tabs';
@@ -9,14 +9,13 @@ import {
   useAutenticacao,
 } from '@/contexts/AutenticacaoContext';
 import { FluxoAutenticacao } from '@/components/autenticacao/FluxoAutenticacao';
-import { Colors } from '@/utils/theme';
+import { TemaProvider, useTema } from '@/contexts/TemaContext';
 
 function ConteudoApp() {
   const { estaCarregando, estaAutenticado } = useAutenticacao();
-  const scheme = useColorScheme();
-  const cores = Colors[scheme === 'dark' ? 'dark' : 'light'];
+  const { cores, estaCarregandoTema } = useTema();
 
-  if (estaCarregando) {
+  if (estaCarregando || estaCarregandoTema) {
     return (
       <View
         style={{
@@ -26,7 +25,7 @@ function ConteudoApp() {
           backgroundColor: cores.background,
         }}
       >
-        <ActivityIndicator size="large" color="#0284C7" />
+        <ActivityIndicator size="large" color={cores.principal} />
       </View>
     );
   }
@@ -38,13 +37,27 @@ function ConteudoApp() {
   return <AppTabs />;
 }
 
-export default function TabLayout() {
-  const colorScheme = useColorScheme();
+function NavegacaoComTema() {
+  const { cores, esquema } = useTema();
+  const temaBase = esquema === 'dark' ? DarkTheme : DefaultTheme;
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+    <ThemeProvider value={{ ...temaBase, colors: {
+      ...temaBase.colors,
+      primary: cores.principal,
+      background: cores.background,
+      card: cores.backgroundElement,
+      text: cores.text,
+      border: cores.backgroundSelected,
+      notification: cores.perigo,
+    } }}>
+      <StatusBar style={esquema === 'dark' ? 'light' : 'dark'} />
       <AutenticacaoProvider>
         <ConteudoApp />
       </AutenticacaoProvider>
     </ThemeProvider>
   );
+}
+
+export default function TabLayout() {
+  return <TemaProvider><NavegacaoComTema /></TemaProvider>;
 }

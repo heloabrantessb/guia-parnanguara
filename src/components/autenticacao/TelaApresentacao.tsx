@@ -6,12 +6,12 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  useColorScheme,
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { Colors } from '@/utils/theme';
+import { CoresTema } from '@/utils/theme';
+import { useTema } from '@/contexts/TemaContext';
 
 const etapasApresentacao = [
   {
@@ -39,8 +39,8 @@ interface TelaApresentacaoProps {
 }
 
 export function TelaApresentacao({ aoConcluir }: TelaApresentacaoProps) {
-  const esquemaCores = useColorScheme();
-  const cores = Colors[esquemaCores === 'dark' ? 'dark' : 'light'];
+  const { cores } = useTema();
+  const estilos = criarEstilos(cores);
   const [etapaAtual, definirEtapaAtual] = useState(0);
   const [estaSalvando, definirEstaSalvando] = useState(false);
   const [mensagemErro, definirMensagemErro] = useState<string | null>(null);
@@ -105,7 +105,7 @@ export function TelaApresentacao({ aoConcluir }: TelaApresentacaoProps) {
         </View>
 
         <View style={[estilos.icone, { backgroundColor: cores.backgroundElement }]}>
-          <Ionicons name={etapa.icone} size={32} color="#0284C7" />
+          <Ionicons name={etapa.icone} size={32} color={cores.principal} />
         </View>
         <Text
           style={[estilos.titulo, { color: cores.text }]}
@@ -142,7 +142,7 @@ export function TelaApresentacao({ aoConcluir }: TelaApresentacaoProps) {
   );
 }
 
-const estilos = StyleSheet.create({
+const criarEstilos = (cores: CoresTema) => StyleSheet.create({
   tela: { flex: 1 },
   conteudo: {
     flexGrow: 1,
@@ -173,7 +173,7 @@ const estilos = StyleSheet.create({
   nomeGuia: { color: '#FFFFFF', fontSize: 24, fontWeight: '700', marginBottom: 12 },
   indicadores: { flexDirection: 'row', gap: 8, marginVertical: 28 },
   indicador: { width: 8, height: 8, borderRadius: 4 },
-  indicadorAtivo: { width: 24, backgroundColor: '#0284C7' },
+  indicadorAtivo: { width: 24, backgroundColor: cores.acao },
   icone: { padding: 16, borderRadius: 18, marginBottom: 20 },
   titulo: { fontSize: 26, fontWeight: '700', textAlign: 'center', paddingHorizontal: 24 },
   descricao: {
@@ -184,7 +184,7 @@ const estilos = StyleSheet.create({
     marginBottom: 24,
     paddingHorizontal: 32,
   },
-  erro: { color: '#DC2626', textAlign: 'center', paddingHorizontal: 24, marginBottom: 16 },
+  erro: { color: cores.perigo, textAlign: 'center', paddingHorizontal: 24, marginBottom: 16 },
   botaoContinuar: {
     alignSelf: 'stretch',
     marginHorizontal: 24,
@@ -192,7 +192,7 @@ const estilos = StyleSheet.create({
     paddingVertical: 18,
     alignItems: 'center',
     borderRadius: 14,
-    backgroundColor: '#0284C7',
+    backgroundColor: cores.acao,
   },
   botaoDesabilitado: { opacity: 0.6 },
   textoContinuar: { color: '#FFFFFF', fontSize: 17, fontWeight: '600' },

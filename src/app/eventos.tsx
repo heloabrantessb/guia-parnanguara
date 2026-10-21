@@ -6,7 +6,6 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  useColorScheme,
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -15,11 +14,12 @@ import { EventoCard } from '@/components/cards/EventoCard';
 import { DetalheAtrativoModal } from '@/components/DetalheAtrativoModal';
 import { listarEventos } from '@/services/eventosService';
 import { Evento } from '@/types/evento';
-import { Colors } from '@/utils/theme';
+import { CoresTema } from '@/utils/theme';
+import { useTema } from '@/contexts/TemaContext';
 
 export default function TelaEventos() {
-  const esquemaCores = useColorScheme();
-  const cores = Colors[esquemaCores === 'dark' ? 'dark' : 'light'];
+  const { cores } = useTema();
+  const estilos = criarEstilos(cores);
   const [eventos, definirEventos] = useState<Evento[]>([]);
   const [estaCarregando, definirEstaCarregando] = useState(true);
   const [estaAtualizando, definirEstaAtualizando] = useState(false);
@@ -85,8 +85,8 @@ export default function TelaEventos() {
           <RefreshControl
             refreshing={estaAtualizando}
             onRefresh={atualizarEventos}
-            colors={['#0284C7']}
-            tintColor="#0284C7"
+            colors={[cores.principal]}
+            tintColor={cores.principal}
           />
         }
         ListHeaderComponent={
@@ -139,7 +139,7 @@ export default function TelaEventos() {
         ListEmptyComponent={
           estaCarregando ? (
             <View style={estilos.estadoVazio}>
-              <ActivityIndicator size="large" color="#0284C7" />
+              <ActivityIndicator size="large" color={cores.principal} />
               <Text style={[estilos.subtitulo, { color: cores.textSecondary }]}>
                 Carregando eventos...
               </Text>
@@ -166,19 +166,19 @@ export default function TelaEventos() {
   );
 }
 
-const estilos = StyleSheet.create({
+const criarEstilos = (cores: CoresTema) => StyleSheet.create({
   tela: { flex: 1 },
   conteudo: { flexGrow: 1, padding: 16, paddingBottom: 32, width: '100%', maxWidth: 800, alignSelf: 'center' },
   cabecalho: { marginTop: 12, marginBottom: 24 },
   titulo: { fontSize: 28, fontWeight: '800' },
   subtitulo: { fontSize: 15, marginTop: 8 },
   cardEvento: { width: '100%', marginRight: 0, marginBottom: 20 },
-  categorias: { color: '#0284C7', fontSize: 12, fontWeight: '700', marginTop: 12, textTransform: 'uppercase' },
+  categorias: { color: cores.principal, fontSize: 12, fontWeight: '700', marginTop: 12, textTransform: 'uppercase' },
   descricao: { fontSize: 14, lineHeight: 21, marginTop: 8 },
-  avisoErro: { marginTop: 20, padding: 16, borderRadius: 12, backgroundColor: '#FEE2E2' },
-  textoErro: { color: '#B91C1C', fontSize: 14, lineHeight: 21 },
+  avisoErro: { marginTop: 20, padding: 16, borderRadius: 12, backgroundColor: cores.perigoSuave },
+  textoErro: { color: cores.perigo, fontSize: 14, lineHeight: 21 },
   botaoTentarNovamente: { paddingVertical: 12, marginTop: 4, alignSelf: 'flex-start' },
-  textoTentarNovamente: { color: '#B91C1C', fontSize: 14, fontWeight: '700' },
+  textoTentarNovamente: { color: cores.perigo, fontSize: 14, fontWeight: '700' },
   estadoVazio: { padding: 28, borderRadius: 16, alignItems: 'center', marginTop: 16 },
   tituloEstadoVazio: { fontSize: 18, fontWeight: '700', marginTop: 16, textAlign: 'center' },
   descricaoEstadoVazio: { fontSize: 14, lineHeight: 21, textAlign: 'center', marginTop: 8 },

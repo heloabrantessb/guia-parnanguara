@@ -9,10 +9,10 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  useColorScheme,
   View,
 } from 'react-native';
-import { Colors } from '@/utils/theme';
+import { CoresTema } from '@/utils/theme';
+import { useTema } from '@/contexts/TemaContext';
 
 interface FormularioRotaModalProps {
   tituloInicial: string;
@@ -27,8 +27,8 @@ export function FormularioRotaModal({
   aoSalvar,
   aoFechar,
 }: FormularioRotaModalProps) {
-  const esquemaCores = useColorScheme();
-  const cores = Colors[esquemaCores === 'dark' ? 'dark' : 'light'];
+  const { cores } = useTema();
+  const estilos = criarEstilos(cores);
   const [titulo, definirTitulo] = useState(tituloInicial);
   const [estaSalvando, definirEstaSalvando] = useState(false);
   const [mensagemErro, definirMensagemErro] = useState<string | null>(null);
@@ -106,15 +106,15 @@ export function FormularioRotaModal({
   );
 }
 
-const estilos = StyleSheet.create({
+const criarEstilos = (cores: CoresTema) => StyleSheet.create({
   fundo: { flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.6)', justifyContent: 'center', padding: 24 },
   cartao: { padding: 24, borderRadius: 20, width: '100%', maxWidth: 480, maxHeight: '90%', alignSelf: 'center' },
   titulo: { fontSize: 22, fontWeight: '700' },
   rotulo: { marginTop: 24, marginBottom: 8, fontSize: 14 },
   campo: { borderWidth: 1, borderRadius: 12, padding: 14, fontSize: 16 },
-  erro: { color: '#DC2626', marginTop: 12, lineHeight: 21 },
+  erro: { color: cores.perigo, marginTop: 12, lineHeight: 21 },
   acoes: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'flex-end', gap: 12, marginTop: 24 },
   botao: { paddingHorizontal: 16, paddingVertical: 14, borderRadius: 12 },
-  botaoSalvar: { backgroundColor: '#0284C7' },
+  botaoSalvar: { backgroundColor: cores.acao },
   textoSalvar: { color: '#FFFFFF', fontWeight: '700' },
 });

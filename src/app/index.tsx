@@ -5,16 +5,16 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
-  FlatList,
   ActivityIndicator,
   RefreshControl,
   StyleSheet,
-  useColorScheme,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 
 import { useAutenticacao } from '@/contexts/AutenticacaoContext';
+import { MascoteCaranguejo } from '@/components/identidade/MascoteCaranguejo';
+import { SimboloLitoraneo } from '@/components/identidade/SimboloLitoraneo';
 import { DestaqueCard } from '@/components/cards/destaqueCard';
 import { LocalCard } from '@/components/cards/LocalCard';
 import { EventoCard } from '@/components/cards/EventoCard';
@@ -25,14 +25,15 @@ import { listarEventos } from '@/services/eventosService';
 import { Local } from '@/types/local';
 import { Categoria } from '@/types/categoria';
 import { Evento } from '@/types/evento';
-import { Colors } from '@/utils/theme';
+import { CoresTema } from '@/utils/theme';
+import { useTema } from '@/contexts/TemaContext';
 import { resolverUrlImagem } from '@/utils/formatadores';
 
 const IMAGEM_PADRAO = require('../assets/museu.jpeg');
 
 export default function TelaHome() {
-  const scheme = useColorScheme();
-  const cores = Colors[scheme === 'dark' ? 'dark' : 'light'];
+  const { cores } = useTema();
+  const styles = criarEstilos(cores);
   const { usuario, ehVisitante } = useAutenticacao();
 
   const [locais, setLocais] = useState<Local[]>([]);
@@ -187,7 +188,7 @@ export default function TelaHome() {
           { backgroundColor: cores.background },
         ]}
       >
-        <ActivityIndicator size="large" color="#0284C7" />
+        <ActivityIndicator size="large" color={cores.principal} />
         <Text
           style={[styles.textoCarregando, { color: cores.textSecondary }]}
         >
@@ -209,8 +210,8 @@ export default function TelaHome() {
           <RefreshControl
             refreshing={estaAtualizando}
             onRefresh={lidarComAtualizacao}
-            colors={['#0284C7']}
-            tintColor="#0284C7"
+            colors={[cores.principal]}
+            tintColor={cores.principal}
           />
         }
       >
@@ -224,8 +225,20 @@ export default function TelaHome() {
               Guia Parnanguara
             </Text>
           </View>
-          <View style={styles.iconeCidadeWrapper}>
-            <Ionicons name="boat-outline" size={24} color="#0284C7" />
+          <SimboloLitoraneo tamanho={52} />
+        </View>
+
+        <View style={styles.conviteLitoral}>
+          <View style={styles.solDecorativo} pointerEvents="none" />
+          <Text style={styles.sobretituloLitoral}>TURISMO · CULTURA · NATUREZA</Text>
+          <View style={styles.apresentacaoMascote}>
+            <Text style={styles.tituloLitoral}>Seu próximo destino tem alma caiçara.</Text>
+            <MascoteCaranguejo tamanho={112} />
+          </View>
+          <Text style={styles.descricaoLitoral}>Histórias, sabores e paisagens. Explore Paranaguá no seu ritmo.</Text>
+          <View style={styles.localizacaoLitoral}>
+            <Ionicons name="location-outline" size={14} color={cores.detalheDestaque} />
+            <Text style={styles.textoLocalizacao}>Paranaguá, Paraná</Text>
           </View>
         </View>
 
@@ -270,7 +283,7 @@ export default function TelaHome() {
         {/* Alerta de erro de conexao com botao de tentar novamente */}
         {mensagemErro && (
           <View style={styles.bannerErro}>
-            <Ionicons name="alert-circle-outline" size={20} color="#DC2626" />
+            <Ionicons name="alert-circle-outline" size={20} color={cores.perigo} />
             <Text style={styles.textoErro}>{mensagemErro}</Text>
             <TouchableOpacity
               onPress={lidarComAtualizacao}
@@ -491,7 +504,7 @@ export default function TelaHome() {
   );
 }
 
-const styles = StyleSheet.create({
+const criarEstilos = (cores: CoresTema) => StyleSheet.create({
   containerSeguro: {
     flex: 1,
   },
@@ -507,15 +520,18 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   scrollContent: {
-    paddingHorizontal: 16,
+    paddingHorizontal: 20,
     paddingBottom: 32,
+    width: '100%',
+    maxWidth: 800,
+    alignSelf: 'center',
   },
   cabecalho: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginTop: 12,
-    marginBottom: 16,
+    marginBottom: 24,
   },
   textoSaudacao: {
     fontSize: 14,
@@ -526,21 +542,21 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     letterSpacing: -0.5,
   },
-  iconeCidadeWrapper: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: '#E0F2FE',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+  conviteLitoral: { backgroundColor: cores.destaque, borderRadius: 28, padding: 24, overflow: 'hidden', marginBottom: 24 },
+  solDecorativo: { position: 'absolute', right: -32, top: -24, width: 150, height: 150, borderRadius: 75, backgroundColor: '#D9A45B', opacity: 0.14 },
+  sobretituloLitoral: { color: '#F2C27C', fontSize: 10, letterSpacing: 1.7, fontWeight: '700', marginBottom: 16 },
+  apresentacaoMascote: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  tituloLitoral: { flex: 1, color: cores.sobreDestaque, fontSize: 26, lineHeight: 32, fontWeight: '800', letterSpacing: -0.8 },
+  descricaoLitoral: { color: cores.detalheDestaque, fontSize: 14, lineHeight: 22, marginTop: 12, maxWidth: 320 },
+  localizacaoLitoral: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 24 },
+  textoLocalizacao: { color: cores.detalheDestaque, fontSize: 12, fontWeight: '500' },
   barraBusca: {
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
     borderRadius: 14,
     paddingHorizontal: 14,
-    height: 48,
+    height: 54,
     marginBottom: 16,
     gap: 10,
   },
@@ -552,19 +568,19 @@ const styles = StyleSheet.create({
   bannerErro: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FEE2E2',
+    backgroundColor: cores.perigoSuave,
     padding: 12,
     borderRadius: 10,
     marginBottom: 16,
     gap: 8,
   },
   textoErro: {
-    color: '#B91C1C',
+    color: cores.perigo,
     fontSize: 13,
     flex: 1,
   },
   botaoTentarNovamente: {
-    backgroundColor: '#DC2626',
+    backgroundColor: '#B33E35',
     paddingHorizontal: 10,
     paddingVertical: 5,
     borderRadius: 6,
@@ -583,13 +599,13 @@ const styles = StyleSheet.create({
   },
   chipCategoria: {
     paddingHorizontal: 16,
-    paddingVertical: 8,
+    paddingVertical: 12,
     borderRadius: 20,
     borderWidth: 1,
   },
   chipCategoriaAtivo: {
-    backgroundColor: '#0284C7',
-    borderColor: '#0284C7',
+    backgroundColor: cores.acao,
+    borderColor: cores.acao,
   },
   textoChipCategoria: {
     fontSize: 13,
@@ -608,7 +624,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   tituloSecao: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: '700',
     letterSpacing: -0.3,
   },

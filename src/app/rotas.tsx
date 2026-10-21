@@ -1,7 +1,8 @@
+import { MascoteCaranguejo } from '@/components/identidade/MascoteCaranguejo';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator, FlatList, Modal, RefreshControl, StyleSheet,
-  Text, TouchableOpacity, useColorScheme, View,
+  Text, TouchableOpacity, View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -12,11 +13,12 @@ import { RoteiroManualModal } from '@/components/rotas/RoteiroManualModal';
 import { GerarRoteiroModal } from '@/components/rotas/GerarRoteiroModal';
 import { criarRotaManual, gerarRota, listarRotas, removerRota, renomearRota } from '@/services/rotasService';
 import { Rota, SolicitacaoGeracaoRota } from '@/types/rota';
-import { Colors } from '@/utils/theme';
+import { CoresTema } from '@/utils/theme';
+import { useTema } from '@/contexts/TemaContext';
 
 export default function TelaRotas() {
-  const esquemaCores = useColorScheme();
-  const cores = Colors[esquemaCores === 'dark' ? 'dark' : 'light'];
+  const { cores } = useTema();
+  const estilos = criarEstilos(cores);
   const { tokenAcesso, sairDaConta } = useAutenticacao();
   const [rotas, definirRotas] = useState<Rota[]>([]);
   const [estaCarregando, definirEstaCarregando] = useState(true);
@@ -143,7 +145,7 @@ export default function TelaRotas() {
     return (
       <SafeAreaView style={[estilos.tela, { backgroundColor: cores.background }]} edges={['top']}>
         <View style={estilos.estadoVisitante}>
-          <Ionicons name="map-outline" size={64} color="#0284C7" />
+          <MascoteCaranguejo pose="mapa" tamanho={152} />
           <Text style={[estilos.titulo, { color: cores.text }]}>Seus passeios, do seu jeito</Text>
           <Text style={[estilos.descricao, { color: cores.textSecondary }]}>
             Entre na sua conta para criar roteiros e consultar suas paradas em Paranaguá.
@@ -166,8 +168,8 @@ export default function TelaRotas() {
         refreshControl={<RefreshControl
           refreshing={estaAtualizando}
           onRefresh={atualizarRotas}
-          colors={['#0284C7']}
-          tintColor="#0284C7"
+          colors={[cores.principal]}
+          tintColor={cores.principal}
         />}
         ListHeaderComponent={
           <View style={estilos.cabecalho}>
@@ -194,10 +196,10 @@ export default function TelaRotas() {
           </View>
         }
         ListEmptyComponent={estaCarregando ? (
-          <ActivityIndicator size="large" color="#0284C7" accessibilityLabel="Carregando roteiros" />
+          <ActivityIndicator size="large" color={cores.principal} accessibilityLabel="Carregando roteiros" />
         ) : !mensagemErro ? (
           <View style={[estilos.estadoVazio, { backgroundColor: cores.backgroundElement }]}>
-            <Ionicons name="trail-sign-outline" size={44} color={cores.textSecondary} />
+            <MascoteCaranguejo pose="mapa" tamanho={112} />
             <Text style={[estilos.nomeRota, { color: cores.text }]}>Seu próximo passeio começa aqui</Text>
             <Text style={[estilos.descricao, { color: cores.textSecondary }]}>Crie seu primeiro roteiro para organizar a visita.</Text>
           </View>
@@ -210,7 +212,7 @@ export default function TelaRotas() {
               accessibilityRole="button"
               accessibilityLabel={`Abrir roteiro ${rota.titulo}`}
             >
-              <Ionicons name="map-outline" size={32} color="#0284C7" />
+              <Ionicons name="map-outline" size={32} color={cores.principal} />
               <View style={estilos.textosRota}>
                 <Text style={[estilos.nomeRota, { color: cores.text }]}>{rota.titulo}</Text>
                 <Text style={[estilos.descricao, { color: cores.textSecondary }]}>
@@ -284,7 +286,7 @@ export default function TelaRotas() {
                 accessibilityRole="button"
                 accessibilityLabel="Confirmar exclusão do roteiro"
                 accessibilityState={{ disabled: estaExcluindo, busy: estaExcluindo }}
-              >{estaExcluindo ? <ActivityIndicator color="#DC2626" /> :
+              >{estaExcluindo ? <ActivityIndicator color={cores.perigo} /> :
                 <Text style={estilos.textoErro}>Excluir roteiro</Text>}
               </TouchableOpacity>
             </View>
@@ -295,13 +297,13 @@ export default function TelaRotas() {
   );
 }
 
-const estilos = StyleSheet.create({
+const criarEstilos = (cores: CoresTema) => StyleSheet.create({
   tela: { flex: 1 },
   lista: { flexGrow: 1, padding: 20, paddingBottom: 32, width: '100%', maxWidth: 800, alignSelf: 'center' },
   cabecalho: { marginTop: 12, marginBottom: 24 },
   titulo: { fontSize: 28, fontWeight: '800' },
   descricao: { fontSize: 15, lineHeight: 23, marginTop: 8 },
-  botaoPrincipal: { backgroundColor: '#0284C7', borderRadius: 14, padding: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 24 },
+  botaoPrincipal: { backgroundColor: cores.acao, borderRadius: 14, padding: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 24 },
   textoBotaoPrincipal: { color: '#FFFFFF', fontSize: 16, fontWeight: '700' },
   estadoVisitante: { flex: 1, padding: 32, justifyContent: 'center', gap: 12, maxWidth: 560, alignSelf: 'center' },
   estadoVazio: { padding: 28, borderRadius: 18, gap: 12 },
@@ -311,9 +313,9 @@ const estilos = StyleSheet.create({
   nomeRota: { fontSize: 20, fontWeight: '700' },
   acoesRota: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'flex-end', gap: 8, paddingHorizontal: 8, paddingBottom: 8 },
   botaoAcao: { padding: 14 },
-  textoAcao: { color: '#0284C7', fontWeight: '700' },
-  textoErro: { color: '#DC2626', lineHeight: 21 },
-  avisoErro: { backgroundColor: '#FEE2E2', padding: 16, borderRadius: 12, marginTop: 20 },
+  textoAcao: { color: cores.principal, fontWeight: '700' },
+  textoErro: { color: cores.perigo, lineHeight: 21 },
+  avisoErro: { backgroundColor: cores.perigoSuave, padding: 16, borderRadius: 12, marginTop: 20 },
   fundoModal: { flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.6)', padding: 24, justifyContent: 'center' },
   confirmacao: { padding: 24, borderRadius: 20, maxWidth: 480, width: '100%', alignSelf: 'center', gap: 12 },
 });

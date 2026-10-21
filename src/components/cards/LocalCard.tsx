@@ -5,15 +5,16 @@ import {
   TouchableOpacity,
   StyleSheet,
   Platform,
-  useColorScheme,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Local } from '@/types/local';
-import { Colors } from '@/utils/theme';
+import { CoresTema } from '@/utils/theme';
+import { useTema } from '@/contexts/TemaContext';
 import {
   formatarHorario,
   formatarValorEntrada,
   resolverUrlImagem,
+  verificarSeEstaAberto,
 } from '@/utils/formatadores';
 
 const IMAGEM_PADRAO = require('../../assets/museu.jpeg');
@@ -24,8 +25,8 @@ interface LocalCardProps {
 }
 
 export function LocalCard({ local, aoPressionar }: LocalCardProps) {
-  const scheme = useColorScheme();
-  const cores = Colors[scheme === 'dark' ? 'dark' : 'light'];
+  const { cores } = useTema();
+  const styles = criarEstilos(cores);
 
   // Busca imagem capa ou a primeira imagem disponivel
   const imagemCapa =
@@ -42,6 +43,11 @@ export function LocalCard({ local, aoPressionar }: LocalCardProps) {
         )}`
       : null;
 
+  const temHorario = Boolean(local.horario_abertura && local.horario_fechamento);
+  const estaAberto = temHorario
+    ? verificarSeEstaAberto(local.horario_abertura, local.horario_fechamento)
+    : null;
+
   const textoValor = formatarValorEntrada(local.valor_entrada);
 
   return (
@@ -49,7 +55,7 @@ export function LocalCard({ local, aoPressionar }: LocalCardProps) {
       style={[
         styles.card,
         {
-          backgroundColor: cores.background,
+          backgroundColor: cores.backgroundElement,
           borderColor: cores.backgroundSelected,
         },
       ]}
@@ -65,6 +71,18 @@ export function LocalCard({ local, aoPressionar }: LocalCardProps) {
           resizeMode="cover"
           accessibilityLabel={local.nome}
         />
+        {estaAberto !== null && (
+          <View
+            style={[
+              styles.badgeStatus,
+              { backgroundColor: estaAberto ? '#277257' : '#64748B' },
+            ]}
+          >
+            <Text style={styles.textoBadgeStatus}>
+              {estaAberto ? 'Aberto' : 'Fechado'}
+            </Text>
+          </View>
+        )}
         {textoValor === 'Entrada gratuita' && (
           <View style={styles.badgeGratuito}>
             <Text style={styles.textoBadgeGratuito}>Gratuito</Text>
@@ -139,9 +157,9 @@ export function LocalCard({ local, aoPressionar }: LocalCardProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const criarEstilos = (cores: CoresTema) => StyleSheet.create({
   card: {
-    borderRadius: 14,
+    borderRadius: 22,
     borderWidth: 1,
     overflow: 'hidden',
     marginBottom: 14,
@@ -162,19 +180,32 @@ const styles = StyleSheet.create({
   },
   containerImagem: {
     width: '100%',
-    height: 140,
-    backgroundColor: '#F1F5F9',
+    height: 180,
+    backgroundColor: cores.marcaSuave,
     position: 'relative',
   },
   imagem: {
     width: '100%',
     height: '100%',
   },
+  badgeStatus: {
+    position: 'absolute',
+    top: 10,
+    left: 10,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
+  },
+  textoBadgeStatus: {
+    color: '#FFFFFF',
+    fontSize: 11,
+    fontWeight: '700',
+  },
   badgeGratuito: {
     position: 'absolute',
     top: 10,
     right: 10,
-    backgroundColor: '#16A34A',
+    backgroundColor: '#277257',
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 6,

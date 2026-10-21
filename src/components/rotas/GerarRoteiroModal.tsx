@@ -1,14 +1,15 @@
 import { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator, Modal, ScrollView, StyleSheet, Text, TextInput,
-  TouchableOpacity, useColorScheme, View,
+  TouchableOpacity, View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { listarCategorias } from '@/services/categoriasService';
 import { buscarPreferencias, salvarPreferencias } from '@/services/preferenciasService';
 import { Categoria } from '@/types/categoria';
 import { SolicitacaoGeracaoRota } from '@/types/rota';
-import { Colors } from '@/utils/theme';
+import { CoresTema } from '@/utils/theme';
+import { useTema } from '@/contexts/TemaContext';
 
 interface GerarRoteiroModalProps {
   tokenAcesso: string;
@@ -17,8 +18,8 @@ interface GerarRoteiroModalProps {
 }
 
 export function GerarRoteiroModal({ tokenAcesso, aoGerar, aoFechar }: GerarRoteiroModalProps) {
-  const esquemaCores = useColorScheme();
-  const cores = Colors[esquemaCores === 'dark' ? 'dark' : 'light'];
+  const { cores } = useTema();
+  const estilos = criarEstilos(cores);
   const [titulo, definirTitulo] = useState('');
   const [tempoDisponivel, definirTempoDisponivel] = useState('120');
   const [categorias, definirCategorias] = useState<Categoria[]>([]);
@@ -122,7 +123,7 @@ export function GerarRoteiroModal({ tokenAcesso, aoGerar, aoFechar }: GerarRotei
             keyboardType="number-pad" maxLength={4} accessibilityLabel="Tempo disponível em minutos"
             style={[estilos.campo, { color: cores.text, borderColor: cores.backgroundSelected }]} />
           <Text style={[estilos.subtitulo, { color: cores.text }]}>Seus interesses</Text>
-          {estaCarregando ? <ActivityIndicator color="#0284C7" accessibilityLabel="Carregando preferências" /> : erroCarregamento ? <View>
+          {estaCarregando ? <ActivityIndicator color={cores.principal} accessibilityLabel="Carregando preferências" /> : erroCarregamento ? <View>
             <Text style={estilos.erro} accessibilityRole="alert">{erroCarregamento}</Text>
             <TouchableOpacity onPress={() => definirTentativaCarregamento((tentativa) => tentativa + 1)} accessibilityRole="button" style={estilos.botao}>
               <Text style={estilos.acao}>Tentar novamente</Text>
@@ -132,13 +133,13 @@ export function GerarRoteiroModal({ tokenAcesso, aoGerar, aoFechar }: GerarRotei
             return <TouchableOpacity key={categoria.id} disabled={estaOcupado || (!estaSelecionada && categoriaIds.length >= 100)}
               onPress={() => alternarCategoria(categoria.id)} accessibilityRole="checkbox"
               accessibilityState={{ checked: estaSelecionada, disabled: estaOcupado || (!estaSelecionada && categoriaIds.length >= 100) }}
-              style={[estilos.categoria, { borderColor: estaSelecionada ? '#0284C7' : cores.backgroundSelected }]}>
+              style={[estilos.categoria, { borderColor: estaSelecionada ? cores.principal : cores.backgroundSelected }]}>
               <Text style={{ color: cores.text }}>{estaSelecionada ? 'Selecionado: ' : ''}{categoria.titulo}</Text>
             </TouchableOpacity>;
           })}
           <TouchableOpacity onPress={salvarPreferenciasSelecionadas} disabled={estaOcupado || estaCarregando || !!erroCarregamento}
             accessibilityRole="button" style={estilos.botao}>
-            {estaSalvandoPreferencias ? <ActivityIndicator color="#0284C7" /> : <Text style={estilos.acao}>Salvar como minhas preferências</Text>}
+            {estaSalvandoPreferencias ? <ActivityIndicator color={cores.principal} /> : <Text style={estilos.acao}>Salvar como minhas preferências</Text>}
           </TouchableOpacity>
           {mensagemPreferencias && <Text style={{ color: cores.text }}>{mensagemPreferencias}</Text>}
           <Text style={[estilos.descricao, { color: cores.textSecondary }]}>A caminhada é estimada pela distância em linha reta e pode variar nas ruas. O tempo até a primeira parada e o retorno não estão incluídos.</Text>
@@ -156,7 +157,7 @@ export function GerarRoteiroModal({ tokenAcesso, aoGerar, aoFechar }: GerarRotei
   );
 }
 
-const estilos = StyleSheet.create({
+const criarEstilos = (cores: CoresTema) => StyleSheet.create({
   tela: { flex: 1 },
   conteudo: { padding: 24, gap: 16, width: '100%', maxWidth: 800, alignSelf: 'center' },
   titulo: { fontSize: 26, fontWeight: '800' },
@@ -164,9 +165,9 @@ const estilos = StyleSheet.create({
   descricao: { fontSize: 15, lineHeight: 23 },
   campo: { borderWidth: 1, borderRadius: 12, padding: 14, fontSize: 16 },
   categoria: { borderWidth: 1, borderRadius: 12, padding: 16 },
-  erro: { color: '#DC2626', lineHeight: 22 },
-  acao: { color: '#0284C7', fontWeight: '700' },
+  erro: { color: cores.perigo, lineHeight: 22 },
+  acao: { color: cores.principal, fontWeight: '700' },
   botao: { paddingVertical: 14 },
-  botaoPrincipal: { padding: 16, backgroundColor: '#0284C7', alignItems: 'center', borderRadius: 12 },
+  botaoPrincipal: { padding: 16, backgroundColor: cores.acao, alignItems: 'center', borderRadius: 12 },
   textoBotao: { color: '#FFFFFF', fontWeight: '700', fontSize: 16 },
 });

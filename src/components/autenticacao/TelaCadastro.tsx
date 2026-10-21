@@ -9,19 +9,19 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  useColorScheme,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAutenticacao } from '@/contexts/AutenticacaoContext';
-import { Colors } from '@/utils/theme';
+import { CoresTema } from '@/utils/theme';
+import { useTema } from '@/contexts/TemaContext';
 
 interface TelaCadastroProps {
   aoNavegarLogin: () => void;
 }
 
 export function TelaCadastro({ aoNavegarLogin }: TelaCadastroProps) {
-  const scheme = useColorScheme();
-  const cores = Colors[scheme === 'dark' ? 'dark' : 'light'];
+  const { cores } = useTema();
+  const styles = criarEstilos(cores);
 
   const { cadastrar, entrarComoVisitante } = useAutenticacao();
 
@@ -118,7 +118,7 @@ export function TelaCadastro({ aoNavegarLogin }: TelaCadastroProps) {
 
         {mensagemErro && (
           <View style={styles.alertaErro}>
-            <Ionicons name="alert-circle" size={18} color="#DC2626" />
+            <Ionicons name="alert-circle" size={18} color={cores.perigo} />
             <Text style={styles.textoErro}>{mensagemErro}</Text>
           </View>
         )}
@@ -310,7 +310,7 @@ export function TelaCadastro({ aoNavegarLogin }: TelaCadastroProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const criarEstilos = (cores: CoresTema) => StyleSheet.create({
   container: {
     flex: 1,
   },
@@ -341,7 +341,7 @@ const styles = StyleSheet.create({
   alertaErro: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FEE2E2',
+    backgroundColor: cores.perigoSuave,
     paddingHorizontal: 14,
     paddingVertical: 10,
     borderRadius: 10,
@@ -349,7 +349,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   textoErro: {
-    color: '#B91C1C',
+    color: cores.perigo,
     fontSize: 13,
     flexShrink: 1,
   },
@@ -381,13 +381,13 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   botaoPrincipal: {
-    backgroundColor: '#0284C7',
+    backgroundColor: cores.acao,
     borderRadius: 12,
     height: 48,
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 8,
-    shadowColor: '#0284C7',
+    shadowColor: cores.acao,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
@@ -431,7 +431,7 @@ const styles = StyleSheet.create({
     marginTop: 24,
   },
   textoLink: {
-    color: '#0284C7',
+    color: cores.principal,
     fontWeight: '700',
     fontSize: 14,
   },

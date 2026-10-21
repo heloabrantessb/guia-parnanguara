@@ -6,12 +6,14 @@ import {
   TouchableOpacity,
   ScrollView,
   StyleSheet,
-  useColorScheme,
+  Platform,
 } from 'react-native';
+import * as Linking from 'expo-linking';
 import { Ionicons } from '@expo/vector-icons';
 import { Local } from '@/types/local';
 import { Evento } from '@/types/evento';
-import { Colors } from '@/utils/theme';
+import { CoresTema } from '@/utils/theme';
+import { useTema } from '@/contexts/TemaContext';
 import {
   formatarDataEvento,
   formatarHorario,
@@ -32,8 +34,8 @@ export function DetalheAtrativoModal({
   atrativo,
   aoFechar,
 }: DetalheAtrativoModalProps) {
-  const scheme = useColorScheme();
-  const cores = Colors[scheme === 'dark' ? 'dark' : 'light'];
+  const { cores } = useTema();
+  const styles = criarEstilos(cores);
 
   if (!atrativo) {
     return null;
@@ -48,6 +50,21 @@ export function DetalheAtrativoModal({
     : IMAGEM_PADRAO;
 
   const valorFormatado = formatarValorEntrada(atrativo.valor_entrada);
+
+  function lidarComAbrirNoMapa() {
+    if (!atrativo) return;
+    const { latitude, longitude, nome } = atrativo;
+    const nomeCodificado = encodeURIComponent(nome);
+    const url = Platform.select({
+      ios: `maps:0,0?q=${nomeCodificado}@${latitude},${longitude}`,
+      android: `geo:0,0?q=${latitude},${longitude}(${nomeCodificado})`,
+      default: `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`,
+    });
+
+    if (url) {
+      Linking.openURL(url);
+    }
+  }
 
   return (
     <Modal
@@ -70,7 +87,7 @@ export function DetalheAtrativoModal({
             accessibilityRole="button"
             accessibilityLabel="Fechar detalhes"
           >
-            <Ionicons name="close" size={24} color="#1E293B" />
+            <Ionicons name="close" size={24} color={cores.text} />
           </TouchableOpacity>
 
           <ScrollView
@@ -115,7 +132,7 @@ export function DetalheAtrativoModal({
 
               <View style={styles.cartaoInfo}>
                 <View style={styles.itemInfo}>
-                  <Ionicons name="location-outline" size={18} color="#0284C7" />
+                  <Ionicons name="location-outline" size={18} color={cores.principal} />
                   <Text
                     style={[styles.textoInfo, { color: cores.textSecondary }]}
                   >
@@ -128,7 +145,7 @@ export function DetalheAtrativoModal({
                     <Ionicons
                       name="calendar-outline"
                       size={18}
-                      color="#0284C7"
+                      color={cores.principal}
                     />
                     <Text
                       style={[styles.textoInfo, { color: cores.textSecondary }]}
@@ -139,7 +156,7 @@ export function DetalheAtrativoModal({
                   </View>
                 ) : (
                   <View style={styles.itemInfo}>
-                    <Ionicons name="time-outline" size={18} color="#0284C7" />
+                    <Ionicons name="time-outline" size={18} color={cores.principal} />
                     <Text
                       style={[styles.textoInfo, { color: cores.textSecondary }]}
                     >
@@ -150,7 +167,7 @@ export function DetalheAtrativoModal({
                 )}
 
                 <View style={styles.itemInfo}>
-                  <Ionicons name="pricetag-outline" size={18} color="#0284C7" />
+                  <Ionicons name="pricetag-outline" size={18} color={cores.principal} />
                   <Text
                     style={[styles.textoInfo, { color: cores.textSecondary }]}
                   >
@@ -158,6 +175,17 @@ export function DetalheAtrativoModal({
                   </Text>
                 </View>
               </View>
+
+              {atrativo.latitude && atrativo.longitude && (
+                <TouchableOpacity
+                  style={styles.botaoMapa}
+                  onPress={lidarComAbrirNoMapa}
+                  accessibilityRole="button"
+                >
+                  <Ionicons name="navigate-outline" size={18} color="#FFFFFF" />
+                  <Text style={styles.textoBotaoMapa}>Como chegar (Abrir no Mapa)</Text>
+                </TouchableOpacity>
+              )}
 
               {atrativo.descricao ? (
                 <View style={styles.secaoDescricao}>
@@ -182,7 +210,7 @@ export function DetalheAtrativoModal({
   );
 }
 
-const styles = StyleSheet.create({
+const criarEstilos = (cores: CoresTema) => StyleSheet.create({
   fundoModal: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.55)',
@@ -199,7 +227,7 @@ const styles = StyleSheet.create({
     top: 16,
     right: 16,
     zIndex: 10,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: cores.backgroundElement,
     width: 36,
     height: 36,
     borderRadius: 18,
@@ -217,7 +245,7 @@ const styles = StyleSheet.create({
   containerImagem: {
     width: '100%',
     height: 220,
-    backgroundColor: '#E2E8F0',
+    backgroundColor: cores.backgroundSelected,
   },
   imagem: {
     width: '100%',
@@ -247,7 +275,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   cartaoInfo: {
-    backgroundColor: '#F8FAFC',
+    backgroundColor: cores.marcaSuave,
     borderRadius: 12,
     padding: 14,
     gap: 10,
@@ -274,5 +302,25 @@ const styles = StyleSheet.create({
   textoDescricao: {
     fontSize: 15,
     lineHeight: 22,
+  },
+  botaoMapa: {
+    backgroundColor: cores.acao,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    borderRadius: 12,
+    gap: 8,
+    marginBottom: 20,
+    elevation: 2,
+    shadowColor: cores.acao,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+  },
+  textoBotaoMapa: {
+    color: '#FFFFFF',
+    fontSize: 15,
+    fontWeight: '700',
   },
 });

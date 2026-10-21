@@ -1,117 +1,135 @@
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  useColorScheme,
-} from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useAutenticacao } from '@/contexts/AutenticacaoContext';
-import { Colors } from '@/utils/theme';
+import { PreferenciaTema, useTema } from '@/contexts/TemaContext';
+import { MascoteCaranguejo } from '@/components/identidade/MascoteCaranguejo';
+import { SimboloLitoraneo } from '@/components/identidade/SimboloLitoraneo';
+import { CoresTema } from '@/utils/theme';
+
+const opcoesTema = [
+  { valor: 'claro', titulo: 'Claro', icone: 'sunny-outline' },
+  { valor: 'escuro', titulo: 'Escuro', icone: 'moon-outline' },
+  { valor: 'sistema', titulo: 'Automático', icone: 'phone-portrait-outline' },
+] as const;
 
 export default function Perfil() {
-  const scheme = useColorScheme();
-  const cores = Colors[scheme === 'dark' ? 'dark' : 'light'];
+  const { cores, preferencia, alterarPreferenciaTema, erroTema } = useTema();
+  const estilos = criarEstilos(cores);
   const { usuario, ehVisitante, sairDaConta } = useAutenticacao();
 
+  function selecionarTema(novaPreferencia: PreferenciaTema) {
+    alterarPreferenciaTema(novaPreferencia);
+  }
+
   return (
-    <View style={[styles.container, { backgroundColor: cores.background }]}>
-      <View style={styles.conteudo}>
-        <View style={styles.avatarWrapper}>
-          <Ionicons
-            name={ehVisitante ? 'person-outline' : 'person'}
-            size={48}
-            color="#0284C7"
-          />
+    <SafeAreaView style={estilos.tela} edges={['top']}>
+      <ScrollView contentContainerStyle={estilos.conteudo}>
+        <Text style={estilos.sobretitulo}>SEU GUIA, DO SEU JEITO</Text>
+        <Text style={estilos.titulo} accessibilityRole="header">Meu perfil</Text>
+        <View style={estilos.cartaoUsuario}>
+          <View style={estilos.avatar}>
+            <Ionicons name="person-outline" size={32} color={cores.principal} />
+          </View>
+          <View style={estilos.identificacao}>
+            <Text style={estilos.nome}>{ehVisitante ? 'Olá, visitante' : usuario?.nome || 'Usuário'}</Text>
+            <Text style={estilos.subtexto}>
+              {ehVisitante ? 'Que bom ter você por aqui.' : usuario?.email}
+            </Text>
+          </View>
         </View>
 
-        {ehVisitante ? (
-          <View style={styles.infoUsuario}>
-            <Text style={[styles.nome, { color: cores.text }]}>Visitante</Text>
-            <Text style={[styles.subtexto, { color: cores.textSecondary }]}>
-              Você está navegando em modo visitante.
-            </Text>
+        <View style={estilos.cartao}>
+          <View style={estilos.cabecalhoSecao}>
+            <Ionicons name="color-palette-outline" size={22} color={cores.principal} />
+            <Text style={estilos.tituloSecao}>Aparência</Text>
           </View>
-        ) : (
-          <View style={styles.infoUsuario}>
-            <Text style={[styles.nome, { color: cores.text }]}>
-              {usuario?.nome || 'Usuário'}
-            </Text>
-            <Text style={[styles.subtexto, { color: cores.textSecondary }]}>
-              {usuario?.email || ''}
-            </Text>
+          <Text style={estilos.subtexto}>Escolha como quer explorar o litoral.</Text>
+          <View style={estilos.opcoes} accessibilityRole="radiogroup" accessibilityLabel="Tema do aplicativo">
+            {opcoesTema.map((opcao) => {
+              const estaSelecionado = preferencia === opcao.valor;
+              return (
+                <TouchableOpacity
+                  key={opcao.valor}
+                  style={[estilos.opcao, estaSelecionado && estilos.opcaoSelecionada]}
+                  onPress={() => selecionarTema(opcao.valor)}
+                  accessibilityRole="radio"
+                  accessibilityLabel={opcao.titulo}
+                  accessibilityState={{ checked: estaSelecionado }}
+                  aria-checked={estaSelecionado}
+                >
+                  <Ionicons name={opcao.icone} size={24} color={estaSelecionado ? cores.principal : cores.textSecondary} />
+                  <Text style={[estilos.textoOpcao, estaSelecionado && { color: cores.principal }]}>{opcao.titulo}</Text>
+                  <Ionicons name={estaSelecionado ? 'checkmark-circle' : 'ellipse-outline'} size={18} color={estaSelecionado ? cores.principal : cores.textSecondary} />
+                </TouchableOpacity>
+              );
+            })}
           </View>
-        )}
-
-        <TouchableOpacity
-          style={[
-            styles.botaoAcao,
-            {
-              backgroundColor: ehVisitante ? '#0284C7' : '#DC2626',
-            },
-          ]}
-          onPress={sairDaConta}
-          accessibilityRole="button"
-        >
-          <Ionicons
-            name={ehVisitante ? 'log-in-outline' : 'log-out-outline'}
-            size={20}
-            color="#FFFFFF"
-          />
-          <Text style={styles.textoBotaoAcao}>
-            {ehVisitante ? 'Fazer login ou cadastrar' : 'Sair da conta'}
+          <Text style={estilos.legenda}>
+            {preferencia === 'sistema' ? 'Acompanha a aparência do seu dispositivo.' : 'Sua escolha será lembrada neste dispositivo.'}
           </Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+          {erroTema && <Text style={estilos.erro} accessibilityRole="alert">{erroTema}</Text>}
+        </View>
+
+        <View style={estilos.cartaoConta}>
+          <View style={estilos.despedidaMascote}>
+            <MascoteCaranguejo pose="horizonte" tamanho={176} />
+            <Text style={estilos.tituloDespedida}>
+              {ehVisitante ? 'Mais caminhos para descobrir' : 'Até o próximo passeio!'}
+            </Text>
+            <Text style={estilos.descricaoDespedida}>
+              {ehVisitante
+                ? 'Entre na sua conta e planeje sua próxima visita ao litoral.'
+                : 'O litoral guarda novas histórias para a sua próxima visita.'}
+            </Text>
+          </View>
+          <TouchableOpacity
+            style={estilos.botaoConta}
+            onPress={sairDaConta}
+            accessibilityRole="button"
+          >
+            <Ionicons name={ehVisitante ? 'log-in-outline' : 'log-out-outline'} size={20} color={ehVisitante ? cores.principal : cores.perigo} />
+            <Text style={[estilos.textoBotaoConta, { color: ehVisitante ? cores.principal : cores.perigo }]}>
+              {ehVisitante ? 'Fazer login ou cadastrar' : 'Sair da conta'}
+            </Text>
+            <Ionicons name="chevron-forward" size={18} color={cores.textSecondary} />
+          </TouchableOpacity>
+        </View>
+        <View style={estilos.marca}>
+          <SimboloLitoraneo tamanho={44} />
+          <Text style={estilos.nomeMarca}>Guia Parnanguara</Text>
+          <Text style={estilos.legenda}>Turismo · Cultura · Natureza</Text>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingHorizontal: 24,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  conteudo: {
-    width: '100%',
-    alignItems: 'center',
-  },
-  avatarWrapper: {
-    width: 96,
-    height: 96,
-    borderRadius: 48,
-    backgroundColor: '#E0F2FE',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 20,
-  },
-  infoUsuario: {
-    alignItems: 'center',
-    marginBottom: 32,
-  },
-  nome: {
-    fontSize: 22,
-    fontWeight: '700',
-    marginBottom: 4,
-  },
-  subtexto: {
-    fontSize: 14,
-    textAlign: 'center',
-  },
-  botaoAcao: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    width: '100%',
-    height: 48,
-    borderRadius: 12,
-  },
-  textoBotaoAcao: {
-    color: '#FFFFFF',
-    fontSize: 15,
-    fontWeight: '600',
-  },
+const criarEstilos = (cores: CoresTema) => StyleSheet.create({
+  tela: { flex: 1, backgroundColor: cores.background },
+  conteudo: { padding: 24, paddingBottom: 40, width: '100%', maxWidth: 640, alignSelf: 'center' },
+  sobretitulo: { color: cores.principal, fontSize: 11, letterSpacing: 1.8, fontWeight: '700', marginTop: 16 },
+  titulo: { color: cores.text, fontSize: 30, fontWeight: '800', letterSpacing: -0.8, marginTop: 8, marginBottom: 28 },
+  cartaoUsuario: { flexDirection: 'row', alignItems: 'center', gap: 16, marginBottom: 28 },
+  avatar: { width: 64, height: 64, borderRadius: 24, backgroundColor: cores.marcaSuave, alignItems: 'center', justifyContent: 'center' },
+  identificacao: { flex: 1, gap: 4 },
+  nome: { color: cores.text, fontSize: 20, fontWeight: '700' },
+  subtexto: { color: cores.textSecondary, fontSize: 14, lineHeight: 21 },
+  cartao: { padding: 20, backgroundColor: cores.backgroundElement, borderRadius: 24, borderWidth: 1, borderColor: cores.backgroundSelected },
+  cabecalhoSecao: { flexDirection: 'row', gap: 10, alignItems: 'center', marginBottom: 8 },
+  tituloSecao: { color: cores.text, fontSize: 18, fontWeight: '700' },
+  opcoes: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 20, marginBottom: 14 },
+  opcao: { flex: 1, minWidth: 64, paddingVertical: 16, paddingHorizontal: 4, borderRadius: 16, borderWidth: 1, borderColor: cores.backgroundSelected, alignItems: 'center', gap: 10 },
+  opcaoSelecionada: { backgroundColor: cores.marcaSuave, borderColor: cores.principal },
+  textoOpcao: { color: cores.textSecondary, fontSize: 12, fontWeight: '600' },
+  legenda: { color: cores.textSecondary, fontSize: 12, lineHeight: 18 },
+  erro: { color: cores.perigo, fontSize: 13, lineHeight: 20, marginTop: 10 },
+  cartaoConta: { marginTop: 20, padding: 20, borderRadius: 24, backgroundColor: cores.backgroundElement, borderWidth: 1, borderColor: cores.backgroundSelected },
+  despedidaMascote: { alignItems: 'center', gap: 8 },
+  tituloDespedida: { color: cores.text, fontSize: 19, fontWeight: '700', textAlign: 'center' },
+  descricaoDespedida: { color: cores.textSecondary, fontSize: 14, lineHeight: 21, textAlign: 'center' },
+  botaoConta: { padding: 16, backgroundColor: cores.backgroundElement, borderRadius: 20, flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 16, borderWidth: 1, borderColor: cores.backgroundSelected },
+  textoBotaoConta: { flex: 1, fontWeight: '600', fontSize: 14 },
+  marca: { alignItems: 'center', marginTop: 40, gap: 8 },
+  nomeMarca: { color: cores.text, fontSize: 16, fontWeight: '800' },
 });
