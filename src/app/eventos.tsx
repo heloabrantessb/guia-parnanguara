@@ -154,7 +154,7 @@ export default function TelaEventos() {
                 Novos eventos serão adicionados em breve. Puxe a lista para atualizar.
               </Text>
             </View>
-          ) : null
+          ) : undefined
         }
       />
       <DetalheAtrativoModal

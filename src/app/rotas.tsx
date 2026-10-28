@@ -203,7 +203,7 @@ export default function TelaRotas() {
             <Text style={[estilos.nomeRota, { color: cores.text }]}>Seu próximo passeio começa aqui</Text>
             <Text style={[estilos.descricao, { color: cores.textSecondary }]}>Crie seu primeiro roteiro para organizar a visita.</Text>
           </View>
-        ) : null}
+        ) : undefined}
         renderItem={({ item: rota }) => (
           <View style={[estilos.cardRota, { borderColor: cores.backgroundSelected }]}>
             <TouchableOpacity

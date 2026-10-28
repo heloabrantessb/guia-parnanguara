@@ -1,4 +1,4 @@
-import { NativeTabs } from 'expo-router/unstable-native-tabs';
+import { NativeTabs } from 'expo-router/native-tabs';
 import { Platform } from 'react-native';
 import { MaterialIcons } from "@expo/vector-icons";
 
@@ -29,7 +29,7 @@ export default function AppTabs() {
         {abas.map((aba) => (
           <Tabs.Screen key={aba.nome} name={aba.nome} options={{
             title: aba.titulo,
-            tabBarIcon: ({ color: cor, size: tamanho }) => <MaterialIcons name={aba.icone} color={cor} size={tamanho} />,
+            tabBarIcon: ({ focused: estaSelecionada, size: tamanho }) => <MaterialIcons name={aba.icone} color={estaSelecionada ? cores.principal : cores.textSecondary} size={tamanho} />,
           }} />
         ))}
       </Tabs>
