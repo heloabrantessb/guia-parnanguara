@@ -228,21 +228,6 @@ export default function TelaHome() {
           <SimboloLitoraneo tamanho={52} />
         </View>
 
-        <View style={styles.conviteLitoral}>
-          <View style={styles.solDecorativo} pointerEvents="none" />
-          <Text style={styles.sobretituloLitoral}>TURISMO · CULTURA · NATUREZA</Text>
-          <View style={styles.apresentacaoMascote}>
-            <Text style={styles.tituloLitoral}>Seu próximo destino tem alma caiçara.</Text>
-            <MascoteCaranguejo tamanho={112} />
-          </View>
-          <Text style={styles.descricaoLitoral}>Histórias, sabores e paisagens. Explore Paranaguá no seu ritmo.</Text>
-          <View style={styles.localizacaoLitoral}>
-            <Ionicons name="location-outline" size={14} color={cores.detalheDestaque} />
-            <Text style={styles.textoLocalizacao}>Paranaguá, Paraná</Text>
-          </View>
-        </View>
-
-        {/* Barra de pesquisa */}
         <View
           style={[
             styles.barraBusca,
@@ -259,7 +244,7 @@ export default function TelaHome() {
           />
           <TextInput
             style={[styles.inputBusca, { color: cores.text }]}
-            placeholder="Buscar locais, praias, museus..."
+            placeholder="Buscar atrações..."
             placeholderTextColor={cores.textSecondary}
             value={termoBusca}
             onChangeText={setTermoBusca}
@@ -280,6 +265,86 @@ export default function TelaHome() {
           )}
         </View>
 
+        <View style={styles.mascoteComFiltros}>
+          <View style={styles.containerMascote}>
+            <MascoteCaranguejo tamanho={88} />
+          </View>
+
+          {categorias.length > 0 && (
+            <View style={styles.secaoCategorias}>
+              <Text style={styles.tituloFiltros}>Explore por categoria</Text>
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.listaCategorias}
+              >
+                <TouchableOpacity
+                  style={[
+                    styles.chipCategoria,
+                    categoriaSelecionadaId === null
+                      ? styles.chipCategoriaAtivo
+                      : {
+                          backgroundColor: cores.backgroundElement,
+                          borderColor: cores.backgroundSelected,
+                        },
+                  ]}
+                  onPress={() => setCategoriaSelecionadaId(null)}
+                  accessibilityRole="button"
+                  accessibilityState={{ selected: categoriaSelecionadaId === null }}
+                >
+                  <Text
+                    style={[
+                      styles.textoChipCategoria,
+                      categoriaSelecionadaId === null
+                        ? styles.textoChipCategoriaAtivo
+                        : { color: cores.text },
+                    ]}
+                  >
+                    Todos
+                  </Text>
+                </TouchableOpacity>
+
+                {categorias.map((categoria) => {
+                  const estaAtiva = categoriaSelecionadaId === categoria.id;
+                  return (
+                    <TouchableOpacity
+                      key={categoria.id}
+                      style={[
+                        styles.chipCategoria,
+                        estaAtiva
+                          ? styles.chipCategoriaAtivo
+                          : {
+                              backgroundColor: cores.backgroundElement,
+                              borderColor: cores.backgroundSelected,
+                            },
+                      ]}
+                      onPress={() =>
+                        setCategoriaSelecionadaId(
+                          estaAtiva ? null : categoria.id
+                        )
+                      }
+                      accessibilityRole="button"
+                      accessibilityState={{ selected: estaAtiva }}
+                    >
+                      <Text
+                        style={[
+                          styles.textoChipCategoria,
+                          estaAtiva
+                            ? styles.textoChipCategoriaAtivo
+                            : { color: cores.text },
+                        ]}
+                      >
+                        {categoria.titulo}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </ScrollView>
+            </View>
+          )}
+
+        </View>
+
         {/* Alerta de erro de conexao com botao de tentar novamente */}
         {mensagemErro && (
           <View style={styles.bannerErro}>
@@ -292,77 +357,6 @@ export default function TelaHome() {
             >
               <Text style={styles.textoBotaoTentarNovamente}>Recarregar</Text>
             </TouchableOpacity>
-          </View>
-        )}
-
-        {/* Carrossel de Categorias */}
-        {categorias.length > 0 && (
-          <View style={styles.secaoCategorias}>
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.listaCategoriasHorizontal}
-            >
-              <TouchableOpacity
-                style={[
-                  styles.chipCategoria,
-                  categoriaSelecionadaId === null
-                    ? styles.chipCategoriaAtivo
-                    : {
-                        backgroundColor: cores.backgroundElement,
-                        borderColor: cores.backgroundSelected,
-                      },
-                ]}
-                onPress={() => setCategoriaSelecionadaId(null)}
-                accessibilityRole="button"
-              >
-                <Text
-                  style={[
-                    styles.textoChipCategoria,
-                    categoriaSelecionadaId === null
-                      ? styles.textoChipCategoriaAtivo
-                      : { color: cores.text },
-                  ]}
-                >
-                  Todos
-                </Text>
-              </TouchableOpacity>
-
-              {categorias.map((categoria) => {
-                const estaAtiva = categoriaSelecionadaId === categoria.id;
-                return (
-                  <TouchableOpacity
-                    key={categoria.id}
-                    style={[
-                      styles.chipCategoria,
-                      estaAtiva
-                        ? styles.chipCategoriaAtivo
-                        : {
-                            backgroundColor: cores.backgroundElement,
-                            borderColor: cores.backgroundSelected,
-                          },
-                    ]}
-                    onPress={() =>
-                      setCategoriaSelecionadaId(
-                        estaAtiva ? null : categoria.id
-                      )
-                    }
-                    accessibilityRole="button"
-                  >
-                    <Text
-                      style={[
-                        styles.textoChipCategoria,
-                        estaAtiva
-                          ? styles.textoChipCategoriaAtivo
-                          : { color: cores.text },
-                      ]}
-                    >
-                      {categoria.titulo}
-                    </Text>
-                  </TouchableOpacity>
-                );
-              })}
-            </ScrollView>
           </View>
         )}
 
@@ -542,7 +536,7 @@ const criarEstilos = (cores: CoresTema) => StyleSheet.create({
     fontWeight: '800',
     letterSpacing: -0.5,
   },
-  conviteLitoral: { backgroundColor: cores.destaque, borderRadius: 28, padding: 24, overflow: 'hidden', marginBottom: 24 },
+  conviteLitoral: { backgroundColor: cores.destaque, overflow: 'hidden', marginBottom: 24 },
   solDecorativo: { position: 'absolute', right: -32, top: -24, width: 150, height: 150, borderRadius: 75, backgroundColor: '#D9A45B', opacity: 0.14 },
   sobretituloLitoral: { color: '#F2C27C', fontSize: 10, letterSpacing: 1.7, fontWeight: '700', marginBottom: 16 },
   apresentacaoMascote: { flexDirection: 'row', alignItems: 'center', gap: 8 },
@@ -590,17 +584,41 @@ const criarEstilos = (cores: CoresTema) => StyleSheet.create({
     fontSize: 12,
     fontWeight: '700',
   },
-  secaoCategorias: {
-    marginBottom: 20,
+  mascoteComFiltros: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    paddingVertical: 4,
+    marginBottom: 24,
   },
-  listaCategoriasHorizontal: {
-    gap: 8,
-    paddingRight: 8,
+  containerMascote: {
+    width: 88,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
+  },
+  secaoCategorias: {
+    flex: 1,
+    minWidth: 0,
+  },
+  tituloFiltros: {
+    color: cores.textSecondary,
+    fontSize: 13,
+    fontWeight: '600',
+    marginBottom: 10,
+  },
+  listaCategorias: {
+    alignItems: 'center',
+    gap: 6,
+    paddingRight: 12,
   },
   chipCategoria: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderRadius: 20,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    minHeight: 34,
+    flexShrink: 0,
+    justifyContent: 'center',
+    borderRadius: 17,
     borderWidth: 1,
   },
   chipCategoriaAtivo: {
@@ -608,7 +626,7 @@ const criarEstilos = (cores: CoresTema) => StyleSheet.create({
     borderColor: cores.acao,
   },
   textoChipCategoria: {
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: '600',
   },
   textoChipCategoriaAtivo: {
