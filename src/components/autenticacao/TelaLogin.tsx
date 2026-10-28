@@ -69,10 +69,6 @@ export function TelaLogin({ aoNavegarCadastro }: TelaLoginProps) {
           <Text style={[styles.titulo, { color: cores.text }]}>
             Guia Parnanguara
           </Text>
-          <Text style={[styles.subtitulo, { color: cores.textSecondary }]}>
-            Turismo, cultura e natureza.
-            Seu encontro com o litoral começa aqui.
-          </Text>
         </View>
 
         {mensagemErro && (
@@ -94,12 +90,6 @@ export function TelaLogin({ aoNavegarCadastro }: TelaLoginProps) {
                 },
               ]}
             >
-              <Ionicons
-                name="mail-outline"
-                size={20}
-                color={cores.textSecondary}
-                style={styles.iconeInput}
-              />
               <TextInput
                 style={[styles.input, { color: cores.text }]}
                 placeholder="seuemail@exemplo.com"
@@ -124,12 +114,6 @@ export function TelaLogin({ aoNavegarCadastro }: TelaLoginProps) {
                 },
               ]}
             >
-              <Ionicons
-                name="lock-closed-outline"
-                size={20}
-                color={cores.textSecondary}
-                style={styles.iconeInput}
-              />
               <TextInput
                 style={[styles.input, { color: cores.text }]}
                 placeholder="Sua senha"
@@ -191,7 +175,6 @@ export function TelaLogin({ aoNavegarCadastro }: TelaLoginProps) {
             onPress={entrarComoVisitante}
             accessibilityRole="button"
           >
-            <Ionicons name="compass-outline" size={20} color={cores.text} />
             <Text style={[styles.textoBotaoVisitante, { color: cores.text }]}>
               Entrar como visitante
             </Text>
